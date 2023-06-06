@@ -5,6 +5,16 @@ App{% endblock %} {% block content %}
   <p class="lead">Just another to-do app.</p>
 </div>
 
+<form method="post">
+  <label for="item">To Do item:</label>
+  <input
+    type="text"
+    id="newItem"
+    name="item"
+  /><br /><br />
+  <button type="submit">Add</button>
+</form>
+
 <div class="row">
   <div class="col-md-12">
     <h2>Items</h2>

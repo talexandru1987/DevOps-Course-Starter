@@ -11,6 +11,7 @@ app.config.from_object(Config())
 
 @app.route("/")
 def index():
+    print(get_items())
     return render_template("index.html", results=get_items())
 
 

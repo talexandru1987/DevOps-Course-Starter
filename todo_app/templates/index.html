@@ -1,5 +1,12 @@
 {% extends "layout.html" %} {% block title %}To-Do
 App{% endblock %} {% block content %}
+
+<script>
+  const updateList = (event) => {
+    itemID = event.target;
+    console.log(itemID);
+  };
+</script>
 <div class="jumbotron jumbotron-fluid p-2">
   <div class="container">
     <h1
@@ -39,9 +46,22 @@ App{% endblock %} {% block content %}
 
     <ul class="list-group mb-4">
       {% for result in results %}
-
       <li class="list-group-item">
-        {{ result.title }}
+        <form>
+          <input
+            class="form-check-input"
+            type="checkbox"
+            value=""
+            id="{{
+        result.id
+        }}"
+            onclick="updateList()"
+          />
+        </form>
+        {% if result.status == "Not Started" %}{{
+        result.title }}{% else %}<del
+          >{{ result.title }}</del
+        >{% endif %}
       </li>
 
       {% endfor %}

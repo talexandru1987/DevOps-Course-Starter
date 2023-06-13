@@ -2,11 +2,26 @@
 App{% endblock %} {% block content %}
 
 <script>
-  const updateList = (event) => {
-    itemID = event.target;
-    console.log(itemID);
+  const updateList = (id, title) => {
+    console.log(id);
+
+    fetch("/s", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        title: title,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => sonsole.log(data))
+      .catch((error) => console.log(error));
   };
 </script>
+
 <div class="jumbotron jumbotron-fluid p-2">
   <div class="container">
     <h1
@@ -46,22 +61,21 @@ App{% endblock %} {% block content %}
 
     <ul class="list-group mb-4">
       {% for result in results %}
-      <li class="list-group-item">
-        <form>
-          <input
-            class="form-check-input"
-            type="checkbox"
-            value=""
-            id="{{
+      <li class="list-group-item listItem">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          value=""
+          id="{{
         result.id
         }}"
-            onclick="updateList()"
-          />
-        </form>
+          onclick="updateList('{{result.id}}')"
+        />
+
         {% if result.status == "Not Started" %}{{
-        result.title }}{% else %}<del
-          >{{ result.title }}</del
-        >{% endif %}
+        result.title }}{% else %}
+        <del>{{ result.title }}</del> {% endif %}
+        {{ result.status }}
       </li>
 
       {% endfor %}

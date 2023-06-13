@@ -11,7 +11,6 @@ app.config.from_object(Config())
 
 @app.route("/")
 def index():
-    print(get_items())
     return render_template("index.html", results=get_items())
 
 
@@ -20,3 +19,12 @@ def add_new_item():
     item = request.form["item"]
     add_item(item)
     return redirect("/")
+
+
+@app.route("/s", methods=["POST"])
+def update_item():
+    data = request.get_json()
+    item = get_item(data["id"])
+    item["status"] = "Completed"
+    save_item(item)
+    return "Hello"

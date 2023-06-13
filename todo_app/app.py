@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 
 from todo_app.flask_config import Config
 
@@ -11,7 +11,8 @@ app.config.from_object(Config())
 
 @app.route("/")
 def index():
-    return render_template("index.html", results=get_items())
+    itemsList = sorted(get_items(), key=lambda x: x["status"])
+    return render_template("index.html", results=itemsList)
 
 
 @app.route("/", methods=["POST"])
@@ -21,10 +22,11 @@ def add_new_item():
     return redirect("/")
 
 
-@app.route("/s", methods=["POST"])
+@app.route("/check", methods=["POST"])
 def update_item():
     data = request.get_json()
     item = get_item(data["id"])
     item["status"] = "Completed"
     save_item(item)
-    return "Hello"
+    response = {"message": "Item updated successfully", "item": item}
+    return jsonify(response), 200

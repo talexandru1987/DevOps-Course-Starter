@@ -5,7 +5,7 @@ App{% endblock %} {% block content %}
   const updateList = (id, title) => {
     console.log(id);
 
-    fetch("/s", {
+    fetch("/check", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -17,7 +17,7 @@ App{% endblock %} {% block content %}
       }),
     })
       .then((response) => response.json())
-      .then((data) => sonsole.log(data))
+      .then((data) => console.log(data))
       .catch((error) => console.log(error));
   };
 </script>
@@ -75,7 +75,6 @@ App{% endblock %} {% block content %}
         {% if result.status == "Not Started" %}{{
         result.title }}{% else %}
         <del>{{ result.title }}</del> {% endif %}
-        {{ result.status }}
       </li>
 
       {% endfor %}

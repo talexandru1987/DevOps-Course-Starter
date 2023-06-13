@@ -30,3 +30,19 @@ def update_item():
     save_item(item)
     response = {"message": "Item updated successfully", "item": item}
     return jsonify(response), 200
+
+
+@app.route("/delete", methods=["POST"])
+def delete_an_item():
+    data = request.get_json()
+    id = get_item(data["id"])
+    print(id["id"])
+    result = delete_item(id["id"])
+
+    if result:
+        response = {"message": "Item deleted successfully", "id": id}
+
+    else:
+        response = {"message": "Item not found", "id": id}
+
+    return jsonify(response), 200

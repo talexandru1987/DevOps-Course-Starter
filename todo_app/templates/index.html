@@ -2,9 +2,7 @@
 App{% endblock %} {% block content %}
 
 <script>
-  const updateList = (id, title) => {
-    console.log(id);
-
+  const updateList = (id) => {
     fetch("/check", {
       method: "POST",
       headers: {
@@ -13,7 +11,24 @@ App{% endblock %} {% block content %}
       },
       body: JSON.stringify({
         id: id,
-        title: title,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.log(error));
+  };
+
+  const deleteItem = (id) => {
+    console.log(id);
+
+    fetch("/delete", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
       }),
     })
       .then((response) => response.json())
@@ -75,6 +90,13 @@ App{% endblock %} {% block content %}
         {% if result.status == "Not Started" %}{{
         result.title }}{% else %}
         <del>{{ result.title }}</del> {% endif %}
+        <button
+          type="button"
+          class="btn btn-danger btn-sm"
+          onclick="deleteItem('{{result.id}}')"
+        >
+          x
+        </button>
       </li>
 
       {% endfor %}

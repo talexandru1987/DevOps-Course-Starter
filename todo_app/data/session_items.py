@@ -80,6 +80,6 @@ def delete_item(id):
     if itemFound:
         items.remove(itemFound)
         session["items"] = items
-        return "Deleted"
+        return True
     else:
-        return None
+        return False

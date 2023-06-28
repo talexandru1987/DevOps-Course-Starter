@@ -1,42 +1,6 @@
 {% extends "layout.html" %} {% block title %}To-Do
 App{% endblock %} {% block content %}
 
-<script>
-  const updateList = (id) => {
-    fetch("/check", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: id,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((error) => console.log(error));
-  };
-
-  const deleteItem = (id) => {
-    console.log(id);
-
-    fetch("/delete", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: id,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
-      .catch((error) => console.log(error));
-  };
-</script>
-
 <div class="jumbotron jumbotron-fluid p-2">
   <div class="container">
     <h1
@@ -76,15 +40,14 @@ App{% endblock %} {% block content %}
 
     <ul class="list-group mb-4">
       {% for result in results %}
-      <li class="list-group-item listItem">
+      <li
+        class="list-group-item listItem"
+        id="{{result.id}}"
+      >
         <input
-          class="form-check-input"
+          class="form-check-input taskUpdate"
           type="checkbox"
           value=""
-          id="{{
-        result.id
-        }}"
-          onclick="updateList('{{result.id}}')"
         />
 
         {% if result.status == "Not Started" %}{{
@@ -92,8 +55,7 @@ App{% endblock %} {% block content %}
         <del>{{ result.title }}</del> {% endif %}
         <button
           type="button"
-          class="btn btn-danger btn-sm"
-          onclick="deleteItem('{{result.id}}')"
+          class="btn btn-danger btn-sm deleteTask"
         >
           x
         </button>

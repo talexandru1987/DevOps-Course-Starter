@@ -1,0 +1,30 @@
+<div
+  class="dropdown-container d-flex justify-content-center align-items-center"
+>
+  <div class="dropdown">
+    <button
+      class="btn btn-secondary dropdown-toggle"
+      type="button"
+      id="dropdownMenuButton"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      Choose Board
+    </button>
+    <div
+      class="dropdown-menu"
+      aria-labelledby="dropdownMenuButton"
+    >
+      {% for obj in boardsList %}
+
+      <a
+        class="dropdown-item"
+        href="/{{ obj.id }}"
+        >{{ obj.name }}</a
+      >
+
+      {%endfor %}
+    </div>
+  </div>
+</div>

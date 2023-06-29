@@ -1,19 +1,5 @@
 {% extends "layout.html" %} {% block title %}To-Do
-App{% endblock %} {% block content %}
-
-<div class="jumbotron jumbotron-fluid p-2">
-  <div class="container">
-    <h1
-      class="display-4 d-flex justify-content-center"
-    >
-      To-Do App
-    </h1>
-    <p class="lead d-flex justify-content-center">
-      Just another to-do app.
-    </p>
-  </div>
-</div>
-
+App {%endblock%} {%block content %}
 <form method="post">
   <div class="form-group">
     <label for="exampleInputEmail1"
@@ -32,39 +18,14 @@ App{% endblock %} {% block content %}
   </button>
 </form>
 
-<div class="row">
-  <div class="col-md-12">
-    <h2 class="d-flex justify-content-center">
-      Items
-    </h2>
-
-    <ul class="list-group mb-4">
-      {% for result in results %}
-      <li
-        class="list-group-item listItem"
-        id="{{result.id}}"
-      >
-        <input
-          class="form-check-input taskUpdate"
-          type="checkbox"
-          value=""
-        />
-
-        {% if result.status == "Not Started" %}{{
-        result.title }}{% else %}
-        <del>{{ result.title }}</del> {% endif %}
-        <button
-          type="button"
-          class="btn btn-danger btn-sm deleteTask"
-        >
-          x
-        </button>
-      </li>
-
-      {% endfor %}
-
-      <!-- List the todo items here -->
-    </ul>
+<h2 class="d-flex justify-content-center">
+  Board content
+</h2>
+<div class="container">
+  <div class="row">
+    <!-- List the todo items here -->
+    {% for result in cardsList %} {% include
+    "card.html" %} {% endfor %}
   </div>
 </div>
 {% endblock %}

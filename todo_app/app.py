@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, session
 
 from todo_app.flask_config import Config
 
 from .data.session_items import *
 
+from .data.trello_items import *
 
 app = Flask(__name__)
 app.config.from_object(Config())
@@ -11,8 +12,18 @@ app.config.from_object(Config())
 
 @app.route("/")
 def index():
-    itemsList = sorted(get_items(), key=lambda x: x["status"])
-    return render_template("index.html", results=itemsList)
+    status = True
+    boardsList = get_boards()
+    return render_template("index.html", boardsList=boardsList, status=status)
+
+
+@app.route("/<id>")
+def render_cards(id):
+    status = False
+    cardsList = get_cards(id)
+    print(cardsList)
+
+    return render_template("index.html", cardsList=cardsList, status=status)
 
 
 @app.route("/", methods=["POST"])

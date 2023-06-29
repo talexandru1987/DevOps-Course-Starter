@@ -55,4 +55,3 @@ if (taskDelete.length > 0) {
     input.addEventListener("click", deleteItem)
   );
 }
-console.log(taskDelete);

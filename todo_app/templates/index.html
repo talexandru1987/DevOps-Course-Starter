@@ -13,9 +13,32 @@ App {%endblock%} {%block content %}
       placeholder="Enter item"
     />
   </div>
-  <button type="submit" class="btn btn-primary">
-    Submit
-  </button>
+  <div class="dropdown">
+    <button
+      class="btn btn-primary dropdown-toggle"
+      type="Submit"
+      id="dropdownMenuButton"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      Add to List:
+    </button>
+    <div
+      class="dropdown-menu"
+      aria-labelledby="dropdownMenuButton"
+    >
+      {% for obj in boardLists %}
+
+      <a
+        class="dropdown-item"
+        href="/{{ obj.id }}"
+        >{{ obj.name }}</a
+      >
+
+      {%endfor %}
+    </div>
+  </div>
 </form>
 
 <h2 class="d-flex justify-content-center">

@@ -1,15 +1,15 @@
-<div class="col-md-2">
-  <div class="card mb-4">
+<div class="col-md-4">
+  <div class="card mb-4" style="max-width: 20rem">
     <div
       class="card-header bg-primary text-white"
     >
-      <h5 class="mb-0">Title</h5>
+      <h5 class="mb-0">{{result.title}}</h5>
     </div>
     <div class="card-body">
       <p class="card-text">
-        Status:
+        List:
         <span class="badge badge-success"
-          >Active</span
+          >{{result.list}}</span
         >
       </p>
       <div class="form-check">
@@ -30,7 +30,7 @@
       <p class="card-text mt-3">
         Date:
         <span class="text-muted"
-          >June 29, 2023</span
+          >{{result.date}}</span
         >
       </p>
     </div>

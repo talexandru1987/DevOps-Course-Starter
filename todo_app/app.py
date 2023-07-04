@@ -21,9 +21,10 @@ def index():
 def render_cards(id):
     status = False
     cardsList = get_cards(id)
-    print(cardsList)
-
-    return render_template("index.html", cardsList=cardsList, status=status)
+    boardLists = get_boardLists(id)
+    return render_template(
+        "index.html", cardsList=cardsList, status=status, boardLists=boardLists
+    )
 
 
 @app.route("/", methods=["POST"])

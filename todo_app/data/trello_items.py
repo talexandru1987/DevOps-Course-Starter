@@ -124,14 +124,25 @@ def get_boardID(name):
 
     return response
 
-    # def get_items():
-    """
-    Fetches all cards from the trello board.
 
-    Returns:
-        list: The list of saved items.
-    """
-    # return session.get("items", _DEFAULT_ITEMS.copy())
+def add_list_item(listId, cardName):
+    searchUrl = baseUrl + "cards"
+
+    addQuery = {
+        "key": os.getenv("TRELLO_KEY"),
+        "token": os.getenv("TRELLO_TOKEN"),
+        "idList": listId,
+        "name": cardName,
+    }
+    try:
+        response = requests.request("POST", searchUrl, params=addQuery)
+        response.raise_for_status()
+        response = response.json()
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        response = False
+
+    return response
 
 
 # boardItem = next((obj for obj in response if obj["name"] == name), None)

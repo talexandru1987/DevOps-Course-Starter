@@ -22,16 +22,28 @@ def render_cards(id):
     status = False
     cardsList = get_cards(id)
     boardLists = get_boardLists(id)
+
     return render_template(
-        "index.html", cardsList=cardsList, status=status, boardLists=boardLists
+        "index.html",
+        cardsList=cardsList,
+        status=status,
+        boardLists=boardLists,
+        boardId=id,
     )
 
 
-@app.route("/", methods=["POST"])
+@app.route("/add", methods=["POST"])
 def add_new_item():
-    item = request.form["item"]
-    add_item(item)
-    return redirect("/")
+    boardId = request.form.get("board_id")
+    inputItem = request.form.get("inputItem")
+    selectedList = request.form.getlist("selectedList")[0]
+
+    if inputItem:
+        add_list_item(selectedList, inputItem)
+
+    print(f"Add to this id+++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print(request.form)
+    return redirect(f"/{boardId}")
 
 
 @app.route("/check", methods=["POST"])

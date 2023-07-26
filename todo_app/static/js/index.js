@@ -55,3 +55,11 @@ if (taskDelete.length > 0) {
     input.addEventListener("click", deleteItem)
   );
 }
+
+$(document).ready(function () {
+  $(".checkbox-group").click(function () {
+    $(".checkbox-group")
+      .not(this)
+      .prop("checked", false);
+  });
+});

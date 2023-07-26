@@ -8,8 +8,10 @@ load_dotenv()
 # globals
 query = {"key": os.getenv("TRELLO_KEY"), "token": os.getenv("TRELLO_TOKEN")}
 baseUrl = "https://api.trello.com/1/"
+headers = {"Accept": "application/json"}
 
 
+# get boards avaialble to the user
 def get_boards():
     searchUrl = baseUrl + "members/me/boards?fields=name"
 
@@ -23,67 +25,56 @@ def get_boards():
     return response
 
 
-def get_cards(id):
-    searchUrl = f"{baseUrl}boards/{id}/cards"
-    idOfBoardLists = []
-    responseObj = []
+# get the cards in a specific list
+def get_list_cards(id):
+    searchUrl = baseUrl + f"lists/{id}/cards"
 
     try:
-        response = requests.request("GET", searchUrl, params=query)
+        response = requests.request("GET", searchUrl, headers=headers, params=query)
         response.raise_for_status()
         response = response.json()
-        if len(response) > 0:
-            # get all the list id's in the reponse
-            found = False
-            for obj in response:
-                listID = obj["idList"]
-                for id in idOfBoardLists:
-                    if id["id"] == listID:
-                        found = True
-                        break
-                    else:
-                        found = False
-                if found == False:
-                    idOfBoardLists.append({"id": listID})
-            # foar each list id get the list name
-            for obj in idOfBoardLists:
-                searchListurl = f"{baseUrl}lists/{obj['id']}"
-                responseList = requests.request("GET", searchListurl, params=query)
-                responseList.raise_for_status()
-                responseList = responseList.json()
-                obj["name"] = responseList["name"]
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        response = None
+    return response
 
-            # create the return card objects
-            for obj in idOfBoardLists:
-                for card in response:
-                    if obj["id"] == card["idList"]:
+
+# get all cards on a board
+def get_cards(id):
+    listSearchUrl = f"{baseUrl}boards/{id}/lists"
+    responseObj = []
+    found = False
+
+    try:
+        # get all lists for the board
+        response = requests.request("GET", listSearchUrl, headers=headers, params=query)
+        response.raise_for_status()
+        boardLists = response.json()
+
+        # get the cards for each list
+        if len(boardLists) > 0:
+            for obj in boardLists:
+                cardsList = get_list_cards(obj["id"])
+                for cardObj in cardsList:
+                    # if responseObj is empty code will not execute so need an if
+                    for card in responseObj:
+                        if cardObj["id"] == card["id"]:
+                            found = True
+                            break
+                        else:
+                            found = False
+                    if found == False:
                         date = datetime.strptime(
-                            card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                            cardObj["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
                         )
                         responseObj.append(
                             {
-                                "title": card["name"],
+                                "id": cardObj["id"],
+                                "title": cardObj["name"],
                                 "list": obj["name"],
                                 "date": date.strftime("%d/%m/%y"),
                             }
                         )
-            # searchListurl = f"{baseUrl}lists/{obj['idList']}"
-            # responseList = requests.request("GET", searchListurl, params=query)
-            # responseList.raise_for_status()
-            # responseList = responseList.json()
-            # date = datetime.strptime(
-            #     obj["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            # )
-            # responseObj.append(
-            #     {
-            #         "title": obj["name"],
-            #         "list": responseList["name"],
-            #         "date": date.strftime("%d/%m/%y"),
-            #     }
-            # )
-
-        print(responseObj)
-
     except requests.exceptions.RequestException as exception:
         print(f"An error occured: {exception}")
         responseObj = []

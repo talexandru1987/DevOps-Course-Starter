@@ -1,47 +1,8 @@
 {% extends "layout.html" %} {% block title %}To-Do
 App {%endblock%} {%block content %}
 
-<form action="/add" method="post">
-  <div class="form-group">
-    <input type="hidden" value="{{boardId}}" name="board_id" />
-    <label>Add new to-do item:</label>
-    <input
-      type="text"
-      class="form-control"
-      id="newItem"
-      name="inputItem"
-      placeholder="Enter item"
-    />
-  </div>
-  <label>Select list:</label>
-   <div class="mb-4">
-  {% for obj in boardLists %}
-
-  <div class="form-check form-check-inline">
-    <input
-      class="form-check-input checkbox-group"
-      type="checkbox"
-      name="selectedList"
-      value="{{ obj.id }}"
-    />
-    <label
-      class="form-check-label"
-      >{{ obj.name }}</label
-    >
-  </div>
-
-  {%endfor %}
-</div>
-  <button
-    class="btn btn-primary"
-    type="Submit"
-    id="submitButton"
-    aria-haspopup="true"
-    aria-expanded="false"
-  >
-    Submit
-  </button>
-</form>
+{% include
+  "addForm.html" %}
 
   <h2 class="d-flex justify-content-center m-4">
     Board content

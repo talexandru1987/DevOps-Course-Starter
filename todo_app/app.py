@@ -41,26 +41,22 @@ def add_new_item():
     if inputItem:
         add_list_item(selectedList, inputItem)
 
-    print(f"Add to this id+++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    print(request.form)
     return redirect(f"/{boardId}")
 
 
-@app.route("/check", methods=["POST"])
+@app.route("/update", methods=["POST"])
 def update_item():
-    data = request.get_json()
-    item = get_item(data["id"])
-    item["status"] = "Completed"
-    save_item(item)
-    response = {"message": "Item updated successfully", "item": item}
-    return jsonify(response), 200
+    print(f"Add to this id+++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print(request.form)
+
+    return "nothing"
 
 
 @app.route("/delete", methods=["POST"])
 def delete_an_item():
     data = request.get_json()
     id = get_item(data["id"])
-    print(id["id"])
+
     result = delete_item(id["id"])
 
     if result:

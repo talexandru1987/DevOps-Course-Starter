@@ -16,7 +16,7 @@ def get_boards():
     searchUrl = baseUrl + "members/me/boards?fields=name"
 
     try:
-        response = requests.request("GET", searchUrl, params=query)
+        response = requests.request("GET", searchUrl, headers=headers, params=query)
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
@@ -25,7 +25,7 @@ def get_boards():
     return response
 
 
-# get the cards in a specific list
+# get the cards in a list
 def get_list_cards(id):
     searchUrl = baseUrl + f"lists/{id}/cards"
 
@@ -39,17 +39,29 @@ def get_list_cards(id):
     return response
 
 
-# get all cards on a board
+# get the lists on  board
+def get_boardLists(id):
+    searchUrl = f"{baseUrl}boards/{id}/lists"
+
+    try:
+        response = requests.request("GET", searchUrl, headers=headers, params=query)
+        response.raise_for_status()
+        response = response.json()
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        response = None
+
+    return response
+
+
+# get cards on a board
 def get_cards(id):
-    listSearchUrl = f"{baseUrl}boards/{id}/lists"
     responseObj = []
     found = False
 
     try:
         # get all lists for the board
-        response = requests.request("GET", listSearchUrl, headers=headers, params=query)
-        response.raise_for_status()
-        boardLists = response.json()
+        boardLists = get_boardLists(id)
 
         # get the cards for each list
         if len(boardLists) > 0:
@@ -81,42 +93,8 @@ def get_cards(id):
     return responseObj
 
 
-def get_boardLists(id):
-    searchUrl = f"{baseUrl}boards/{id}/lists"
-
-    try:
-        response = requests.request("GET", searchUrl, params=query)
-        response.raise_for_status()
-        response = response.json()
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        response = None
-
-    return response
-
-
-def get_boardID(name):
-    searchUrl = baseUrl + "members/me/boards?fields=name"
-
-    try:
-        response = requests.request("GET", searchUrl, params=query)
-        response.raise_for_status()
-        response = response.json()
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        response = None
-
-    if response:
-        boardItem = next((obj for obj in response if obj["name"] == name), None)
-        if boardItem:
-            return boardItem["id"]
-        else:
-            return None
-
-    return response
-
-
-def add_list_item(listId, cardName):
+# add a new card to the board
+def add_card(listId, cardName):
     searchUrl = baseUrl + "cards"
 
     addQuery = {
@@ -126,7 +104,7 @@ def add_list_item(listId, cardName):
         "name": cardName,
     }
     try:
-        response = requests.request("POST", searchUrl, params=addQuery)
+        response = requests.request("POST", searchUrl, headers=headers, params=addQuery)
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
@@ -136,4 +114,36 @@ def add_list_item(listId, cardName):
     return response
 
 
-# boardItem = next((obj for obj in response if obj["name"] == name), None)
+# update a card on the board
+def update_card(cardId, listId):
+    searchUrl = baseUrl + f"cards/{cardId}"
+
+    addQuery = {
+        "key": os.getenv("TRELLO_KEY"),
+        "token": os.getenv("TRELLO_TOKEN"),
+        "idList": listId,
+    }
+    try:
+        response = requests.request("PUT", searchUrl, headers=headers, params=addQuery)
+        response.raise_for_status()
+        response = response.json()
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        response = False
+
+    return response
+
+
+# update a card on the board
+def delete_card(cardId):
+    searchUrl = baseUrl + f"cards/{cardId}"
+
+    try:
+        response = requests.request("DELETE", searchUrl, params=query)
+        response.raise_for_status()
+        response = response.json()
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        response = False
+
+    return response

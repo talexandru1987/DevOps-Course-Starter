@@ -39,30 +39,24 @@ def add_new_item():
     selectedList = request.form.getlist("selectedList")[0]
 
     if inputItem:
-        add_list_item(selectedList, inputItem)
+        add_card(selectedList, inputItem)
 
     return redirect(f"/{boardId}")
 
 
 @app.route("/update", methods=["POST"])
 def update_item():
-    print(f"Add to this id+++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    print(request.form)
+    boardId = request.form.get("board_id")
+    cardId = request.form.get("card_id")
+    listId = request.form.get("updateList")
+    update_card(cardId, listId)
 
-    return "nothing"
+    return redirect(f"/{boardId}")
 
 
 @app.route("/delete", methods=["POST"])
 def delete_an_item():
-    data = request.get_json()
-    id = get_item(data["id"])
-
-    result = delete_item(id["id"])
-
-    if result:
-        response = {"message": "Item deleted successfully", "id": id}
-
-    else:
-        response = {"message": "Item not found", "id": id}
-
-    return jsonify(response), 200
+    boardId = request.form.get("board_id")
+    cardId = request.form.get("card_id")
+    delete_card(cardId)
+    return redirect(f"/{boardId}")

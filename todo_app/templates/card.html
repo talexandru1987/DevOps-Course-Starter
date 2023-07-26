@@ -12,11 +12,10 @@
           >{{result.list}}</span
         >
       </p>
-      <label>Update Card Status:</label>
+      <label>Change List:</label>
       <div class="container mb-1">
         <div class="p-1">
           <form action="/update" method="post">
-            {% for obj in boardLists %}
             <input
               type="hidden"
               value="{{boardId}}"
@@ -24,9 +23,10 @@
             />
             <input
               type="hidden"
-              value="{{boardId}}"
+              value="{{result.id}}"
               name="card_id"
             />
+            {% for obj in boardLists %}
             <div
               class="btn-group"
               data-toggle="buttons"
@@ -58,11 +58,26 @@
           </form>
         </div>
         <div>
-          <button class="btn btn-danger mt-3">
-            Delete
-          </button>
+          <form action="/delete" method="post">
+            <input
+              type="hidden"
+              value="{{boardId}}"
+              name="board_id"
+            />
+            <input
+              type="hidden"
+              value="{{result.id}}"
+              name="card_id"
+            />
+            <button
+              type="Submit"
+              class="btn btn-danger mt-3"
+            >
+              Delete
+            </button>
+          </form>
           <p class="card-text mt-3">
-            Date:
+            Last Updated:
             <span class="text-muted"
               >{{result.date}}</span
             >

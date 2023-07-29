@@ -1,4 +1,3 @@
-from flask import session
 import requests
 import os
 from dotenv import load_dotenv
@@ -9,6 +8,19 @@ load_dotenv()
 query = {"key": os.getenv("TRELLO_KEY"), "token": os.getenv("TRELLO_TOKEN")}
 baseUrl = "https://api.trello.com/1/"
 headers = {"Accept": "application/json"}
+
+
+class Item:
+    def __init__(self, id, name, date, status="To Do"):
+        self.id = id
+        self.name = name
+        self.status = status
+        self.date = date
+
+    @classmethod
+    def from_trello_card(cls, card, list):
+        date = datetime.strptime(card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        return cls(card["id"], card["name"], date.strftime("%d/%m/%y"), list["name"])
 
 
 # get boards avaialble to the user
@@ -56,7 +68,7 @@ def get_boardLists(id):
 
 # get cards on a board
 def get_cards(id):
-    responseObj = []
+    classItems = []
     found = False
 
     try:
@@ -67,30 +79,25 @@ def get_cards(id):
         if len(boardLists) > 0:
             for obj in boardLists:
                 cardsList = get_list_cards(obj["id"])
-                for cardObj in cardsList:
-                    # if responseObj is empty code will not execute so need an if
-                    for card in responseObj:
-                        if cardObj["id"] == card["id"]:
+                for cardList in cardsList:
+                    # if classItems is empty code will not execute so need an if
+                    for card in classItems:
+                        if cardList["id"] == card.id:
                             found = True
                             break
                         else:
                             found = False
                     if found == False:
                         date = datetime.strptime(
-                            cardObj["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                            cardList["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
                         )
-                        responseObj.append(
-                            {
-                                "id": cardObj["id"],
-                                "title": cardObj["name"],
-                                "list": obj["name"],
-                                "date": date.strftime("%d/%m/%y"),
-                            }
-                        )
+                        # create the class items
+                        item = Item.from_trello_card(cardList, obj)
+                        classItems.append(item)
     except requests.exceptions.RequestException as exception:
         print(f"An error occured: {exception}")
-        responseObj = []
-    return responseObj
+        classItems = []
+    return classItems
 
 
 # add a new card to the board

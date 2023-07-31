@@ -63,3 +63,10 @@ $(document).ready(function () {
       .prop("checked", false);
   });
 });
+
+$(document).ready(function () {
+  $("#datepicker").datepicker({
+    format: "dd-mm-yy",
+    autoclose: true,
+  });
+});

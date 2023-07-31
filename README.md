@@ -58,6 +58,10 @@ make a file change). There's also a
 variable which is used to encrypt the flask
 session cookie.
 
+The TRELLO_TOKEN, TRELLO_KEY in the `.env` need to
+be completed with the secure credentials from your
+trello account for the application to work.
+
 ## Running the App
 
 Once the all dependencies have been installed,
@@ -84,8 +88,9 @@ Now visit
 [`http://localhost:5000/`](http://localhost:5000/)
 in your web browser to view the app.
 
-Updates to readme
+## Using the app
 
-- talk about the new tes in .env file and update
-  the sample one
-- describe the trello items
+Whe the app starts the user will be presented with
+dropdawn option containing the available boards on
+their Trello account. After choosing a board the
+app will render all the cards on the board.

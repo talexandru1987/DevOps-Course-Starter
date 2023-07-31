@@ -2,9 +2,9 @@ from flask import Flask, render_template, request, redirect, jsonify, session
 
 from todo_app.flask_config import Config
 
-from .data.session_items import *
-
 from .data.trello_items import *
+
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config())
@@ -21,6 +21,7 @@ def index():
 def render_cards(id):
     status = False
     cardsList = get_cards(id)
+    cardsList.sort(key=lambda x: x.status)
     boardLists = get_boardLists(id)
 
     return render_template(
@@ -37,9 +38,11 @@ def add_new_item():
     boardId = request.form.get("board_id")
     inputItem = request.form.get("inputItem")
     selectedList = request.form.getlist("selectedList")[0]
-
+    itemDescription = request.form.get("itemDescription")
+    dueDate = request.form.get("dueDate")
+    date_object = datetime.strptime(dueDate, "%d-%m-%y").date()
     if inputItem:
-        add_card(selectedList, inputItem)
+        add_card(selectedList, inputItem, itemDescription, date_object)
 
     return redirect(f"/{boardId}")
 

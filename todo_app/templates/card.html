@@ -5,7 +5,11 @@
     >
       <h5 class="mb-0">{{result.name}}</h5>
     </div>
+
     <div class="card-body">
+      <p class="card-text">
+        {{result.description}}
+      </p>
       <p class="card-text">
         List:
         <span class="badge badge-success"
@@ -80,6 +84,12 @@
             Last Updated:
             <span class="text-muted"
               >{{result.date}}</span
+            >
+          </p>
+          <p class="card-text mt-3">
+            Due Date:
+            <span class="text-muted"
+              >{{result.dueDate}}</span
             >
           </p>
         </div>

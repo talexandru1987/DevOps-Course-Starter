@@ -11,16 +11,36 @@ headers = {"Accept": "application/json"}
 
 
 class Item:
-    def __init__(self, id, name, date, status="To Do"):
+    def __init__(
+        self,
+        id,
+        name,
+        date,
+        dueDate=None,
+        description=None,
+        status="To Do",
+    ):
         self.id = id
         self.name = name
         self.status = status
         self.date = date
+        self.dueDate = dueDate if dueDate is not None else "12-12-12"
+        self.description = (
+            description if description is not (None or "") else "No description"
+        )
 
     @classmethod
     def from_trello_card(cls, card, list):
         date = datetime.strptime(card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ")
-        return cls(card["id"], card["name"], date.strftime("%d/%m/%y"), list["name"])
+
+        return cls(
+            card["id"],
+            card["name"],
+            date.strftime("%d/%m/%y"),
+            card["due"],
+            card["desc"],
+            list["name"],
+        )
 
 
 # get boards avaialble to the user
@@ -93,6 +113,7 @@ def get_cards(id):
                         )
                         # create the class items
                         item = Item.from_trello_card(cardList, obj)
+
                         classItems.append(item)
     except requests.exceptions.RequestException as exception:
         print(f"An error occured: {exception}")
@@ -101,7 +122,7 @@ def get_cards(id):
 
 
 # add a new card to the board
-def add_card(listId, cardName):
+def add_card(listId, cardName, desc, due):
     searchUrl = baseUrl + "cards"
 
     addQuery = {
@@ -109,6 +130,8 @@ def add_card(listId, cardName):
         "token": os.getenv("TRELLO_TOKEN"),
         "idList": listId,
         "name": cardName,
+        "desc": desc,
+        "due": due,
     }
     try:
         response = requests.request("POST", searchUrl, headers=headers, params=addQuery)

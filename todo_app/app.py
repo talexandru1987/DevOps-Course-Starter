@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, jsonify, session
+from flask import Flask, render_template, request, redirect
 
 from todo_app.flask_config import Config
 
+from .data.trello_items import *
+
 from .data.session_items import *
 
-from .data.trello_items import *
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config())
@@ -21,39 +23,47 @@ def index():
 def render_cards(id):
     status = False
     cardsList = get_cards(id)
-    print(cardsList)
+    cardsList.sort(key=lambda x: x.status)
+    boardLists = get_boardLists(id)
+    # add to session items
+    save_board_id(id)
 
-    return render_template("index.html", cardsList=cardsList, status=status)
+    return render_template(
+        "index.html",
+        cardsList=cardsList,
+        status=status,
+        boardLists=boardLists,
+        boardId=id,
+    )
 
 
-@app.route("/", methods=["POST"])
+@app.route("/add", methods=["POST"])
 def add_new_item():
-    item = request.form["item"]
-    add_item(item)
-    return redirect("/")
+    boardId = session["boardID"]
+    inputItem = request.form.get("inputItem")
+    selectedList = request.form.get("selectedList")
+    itemDescription = request.form.get("itemDescription")
+    dueDate = request.form.get("dueDate")
+    date_object = datetime.strptime(dueDate, "%d-%m-%y").date()
+    if inputItem:
+        add_card(selectedList, inputItem, itemDescription, date_object)
+
+    return redirect(f"/{boardId}")
 
 
-@app.route("/check", methods=["POST"])
+@app.route("/update", methods=["POST"])
 def update_item():
-    data = request.get_json()
-    item = get_item(data["id"])
-    item["status"] = "Completed"
-    save_item(item)
-    response = {"message": "Item updated successfully", "item": item}
-    return jsonify(response), 200
+    boardId = session["boardID"]
+    cardId = request.form.get("card_id")
+    listId = request.form.get("updateList")
+    update_card(cardId, listId)
+
+    return redirect(f"/{boardId}")
 
 
 @app.route("/delete", methods=["POST"])
 def delete_an_item():
-    data = request.get_json()
-    id = get_item(data["id"])
-    print(id["id"])
-    result = delete_item(id["id"])
-
-    if result:
-        response = {"message": "Item deleted successfully", "id": id}
-
-    else:
-        response = {"message": "Item not found", "id": id}
-
-    return jsonify(response), 200
+    boardId = session["boardID"]
+    cardId = request.form.get("card_id")
+    delete_card(cardId)
+    return redirect(f"/{boardId}")

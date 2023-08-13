@@ -1,0 +1,64 @@
+<div class="p-3">
+  <form action="/add" method="post">
+    <div class="form-group">
+      <label>Add new to-do item:</label>
+      <input
+        type="text"
+        class="form-control"
+        id="newItem"
+        name="inputItem"
+        placeholder="Enter item"
+      />
+    </div>
+    <div class="form-group">
+      <label>Item Description:</label>
+      <textarea
+        class="form-control"
+        name="itemDescription"
+        rows="3"
+      ></textarea>
+    </div>
+    <label>Select due date:</label>
+    <div class="container">
+      <input
+        type="text"
+        class="form-control"
+        id="datepicker"
+        style="width: 300px"
+        name="dueDate"
+        required
+      />
+    </div>
+    <label>Select list:</label>
+    <div class="mb-4">
+      {% for obj in boardLists %}
+      <div
+        class="btn-group"
+        data-toggle="buttons"
+      >
+        <label
+          class="btn btn-primary active btn-sm"
+        >
+          <input
+            type="radio"
+            name="selectedList"
+            value="{{ obj.id }}"
+            autocomplete="off"
+            checked
+          />
+          {{ obj.name }}
+        </label>
+      </div>
+      {%endfor %}
+    </div>
+    <button
+      class="btn btn-primary"
+      type="Submit"
+      id="submitButton"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      Submit
+    </button>
+  </form>
+</div>

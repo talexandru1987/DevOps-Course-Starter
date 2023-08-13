@@ -1,19 +1,60 @@
-from flask import session
 import requests
 import os
 from dotenv import load_dotenv
+from datetime import datetime
+from .session_items import *
 
 load_dotenv()
 # globals
 query = {"key": os.getenv("TRELLO_KEY"), "token": os.getenv("TRELLO_TOKEN")}
 baseUrl = "https://api.trello.com/1/"
+headers = {"Accept": "application/json"}
 
 
+class Item:
+    def __init__(
+        self,
+        id,
+        name,
+        date,
+        dueDate=None,
+        description=None,
+        status="To Do",
+    ):
+        self.id = id
+        self.name = name
+        self.status = status
+        self.date = date
+        self.dueDate = dueDate if dueDate is not None else "12-12-12"
+        self.description = (
+            description if description is not (None or "") else "No description"
+        )
+
+    @classmethod
+    def from_trello_card(cls, card, list):
+        lastActiveDate = datetime.strptime(
+            card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
+        ).strftime("%d/%m/%y")
+        dueDate = datetime.strptime(card["due"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime(
+            "%d/%m/%y"
+        )
+
+        return cls(
+            card["id"],
+            card["name"],
+            lastActiveDate,
+            dueDate,
+            card["desc"],
+            list["name"],
+        )
+
+
+# get boards avaialble to the user
 def get_boards():
     searchUrl = baseUrl + "members/me/boards?fields=name"
 
     try:
-        response = requests.request("GET", searchUrl, params=query)
+        response = requests.request("GET", searchUrl, headers=headers, params=query)
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
@@ -22,47 +63,110 @@ def get_boards():
     return response
 
 
+# get the cards in a list
+def get_list_cards(id):
+    searchUrl = baseUrl + f"lists/{id}/cards"
+
+    try:
+        response = requests.request("GET", searchUrl, headers=headers, params=query)
+        response.raise_for_status()
+        response = response.json()
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        response = None
+    return response
+
+
+# get the lists on  board
+def get_boardLists(id):
+    searchUrl = f"{baseUrl}boards/{id}/lists"
+
+    try:
+        response = requests.request("GET", searchUrl, headers=headers, params=query)
+        response.raise_for_status()
+        response = response.json()
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        response = None
+
+    return response
+
+
+# get cards on a board
 def get_cards(id):
-    searchUrl = f"{baseUrl}boards/{id}/cards"
+    classItems = []
+    found = False
 
     try:
-        response = requests.request("GET", searchUrl, params=query)
+        # get all lists for the board
+        boardLists = get_boardLists(id)
+
+        # get the cards for each list
+        if len(boardLists) > 0:
+            for obj in boardLists:
+                cardsList = get_list_cards(obj["id"])
+                for cardList in cardsList:
+                    item = Item.from_trello_card(cardList, obj)
+                    classItems.append(item)
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        classItems = []
+    return classItems
+
+
+# add a new card to the board
+def add_card(listId, cardName, desc, due):
+    searchUrl = baseUrl + "cards"
+
+    addQuery = {
+        "key": os.getenv("TRELLO_KEY"),
+        "token": os.getenv("TRELLO_TOKEN"),
+        "idList": listId,
+        "name": cardName,
+        "desc": desc,
+        "due": due,
+    }
+    try:
+        response = requests.request("POST", searchUrl, headers=headers, params=addQuery)
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
         print(f"An error occured: {exception}")
-        response = None
+        response = False
+
     return response
 
 
-def get_boardID(name):
-    searchUrl = baseUrl + "members/me/boards?fields=name"
+# update a card on the board
+def update_card(cardId, listId):
+    searchUrl = baseUrl + f"cards/{cardId}"
 
+    addQuery = {
+        "key": os.getenv("TRELLO_KEY"),
+        "token": os.getenv("TRELLO_TOKEN"),
+        "idList": listId,
+    }
     try:
-        response = requests.request("GET", searchUrl, params=query)
+        response = requests.request("PUT", searchUrl, headers=headers, params=addQuery)
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
         print(f"An error occured: {exception}")
-        response = None
-
-    if response:
-        boardItem = next((obj for obj in response if obj["name"] == name), None)
-        if boardItem:
-            return boardItem["id"]
-        else:
-            return None
+        response = False
 
     return response
 
-    # def get_items():
-    """
-    Fetches all cards from the trello board.
 
-    Returns:
-        list: The list of saved items.
-    """
-    # return session.get("items", _DEFAULT_ITEMS.copy())
+# update a card on the board
+def delete_card(cardId):
+    searchUrl = baseUrl + f"cards/{cardId}"
 
+    try:
+        response = requests.request("DELETE", searchUrl, params=query)
+        response.raise_for_status()
+        response = response.json()
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        response = False
 
-# boardItem = next((obj for obj in response if obj["name"] == name), None)
+    return response

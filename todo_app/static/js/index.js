@@ -55,3 +55,10 @@ if (taskDelete.length > 0) {
     input.addEventListener("click", deleteItem)
   );
 }
+
+$(document).ready(function () {
+  $("#datepicker").datepicker({
+    format: "dd-mm-yy",
+    autoclose: true,
+  });
+});

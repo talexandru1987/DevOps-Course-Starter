@@ -1,31 +1,18 @@
 {% extends "layout.html" %} {% block title %}To-Do
 App {%endblock%} {%block content %}
-<form method="post">
-  <div class="form-group">
-    <label for="exampleInputEmail1"
-      >To-do item</label
-    >
-    <input
-      type="text"
-      class="form-control"
-      id="newItem"
-      name="item"
-      placeholder="Enter item"
-    />
-  </div>
-  <button type="submit" class="btn btn-primary">
-    Submit
-  </button>
-</form>
 
-<h2 class="d-flex justify-content-center">
-  Board content
-</h2>
-<div class="container">
-  <div class="row">
-    <!-- List the todo items here -->
-    {% for result in cardsList %} {% include
-    "card.html" %} {% endfor %}
+{% include
+  "addForm.html" %}
+
+  <h2 class="d-flex justify-content-center m-4">
+    Board content
+  </h2>
+  <div class="container">
+    <div class="row">
+      <!-- List the todo items here -->
+      {% for result in cardsList %} {% include
+      "card.html" %} {% endfor %}
+    </div>
   </div>
-</div>
-{% endblock %}
+  {% endblock %}
+</form>

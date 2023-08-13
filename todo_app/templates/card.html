@@ -1,38 +1,89 @@
-<div class="col-md-2">
-  <div class="card mb-4">
+<div class="col-md-4">
+  <div class="card mb-4" style="max-width: 20rem">
     <div
       class="card-header bg-primary text-white"
     >
-      <h5 class="mb-0">Title</h5>
+      <h5 class="mb-0">{{result.name}}</h5>
     </div>
+
     <div class="card-body">
       <p class="card-text">
-        Status:
+        {{result.description}}
+      </p>
+      <p class="card-text">
+        List:
         <span class="badge badge-success"
-          >Active</span
+          >{{result.status}}</span
         >
       </p>
-      <div class="form-check">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          id="checkbox"
-        />
-        <label
-          class="form-check-label"
-          for="checkbox"
-          >Check Option</label
-        >
+      <label>Change List:</label>
+      <div class="container mb-1">
+        <div class="p-1">
+          <form action="/update" method="post">
+            <input
+              type="hidden"
+              value="{{result.id}}"
+              name="card_id"
+            />
+            {% for obj in boardLists %}
+            <div
+              class="btn-group"
+              data-toggle="buttons"
+            >
+              <label
+                class="btn btn-primary active btn-sm"
+              >
+                <input
+                  type="radio"
+                  name="updateList"
+                  value="{{ obj.id }}"
+                  autocomplete="off"
+                  checked
+                />
+                {{ obj.name }}
+              </label>
+            </div>
+
+            {%endfor %}
+            <button
+              class="btn btn-primary btn-sm"
+              type="Submit"
+              id="submitButton"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Update
+            </button>
+          </form>
+        </div>
+        <div>
+          <form action="/delete" method="post">
+            <input
+              type="hidden"
+              value="{{result.id}}"
+              name="card_id"
+            />
+            <button
+              type="Submit"
+              class="btn btn-danger mt-3"
+            >
+              Delete
+            </button>
+          </form>
+          <p class="card-text mt-3">
+            Last Updated:
+            <span class="text-muted"
+              >{{result.date}}</span
+            >
+          </p>
+          <p class="card-text mt-3">
+            Due Date:
+            <span class="text-muted"
+              >{{result.dueDate}}</span
+            >
+          </p>
+        </div>
       </div>
-      <button class="btn btn-danger mt-3">
-        Delete
-      </button>
-      <p class="card-text mt-3">
-        Date:
-        <span class="text-muted"
-          >June 29, 2023</span
-        >
-      </p>
     </div>
   </div>
 </div>

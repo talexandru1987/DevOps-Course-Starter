@@ -57,14 +57,6 @@ if (taskDelete.length > 0) {
 }
 
 $(document).ready(function () {
-  $(".checkbox-group").click(function () {
-    $(".checkbox-group")
-      .not(this)
-      .prop("checked", false);
-  });
-});
-
-$(document).ready(function () {
   $("#datepicker").datepicker({
     format: "dd-mm-yy",
     autoclose: true,

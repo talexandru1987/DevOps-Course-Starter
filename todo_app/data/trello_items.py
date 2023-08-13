@@ -1,7 +1,8 @@
 import requests
 import os
 from dotenv import load_dotenv
-from datetime import datetime, date
+from datetime import datetime
+from .session_items import *
 
 load_dotenv()
 # globals
@@ -31,13 +32,18 @@ class Item:
 
     @classmethod
     def from_trello_card(cls, card, list):
-        date = datetime.strptime(card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        lastActiveDate = datetime.strptime(
+            card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
+        ).strftime("%d/%m/%y")
+        dueDate = datetime.strptime(card["due"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime(
+            "%d/%m/%y"
+        )
 
         return cls(
             card["id"],
             card["name"],
-            date.strftime("%d/%m/%y"),
-            card["due"],
+            lastActiveDate,
+            dueDate,
             card["desc"],
             list["name"],
         )
@@ -100,21 +106,8 @@ def get_cards(id):
             for obj in boardLists:
                 cardsList = get_list_cards(obj["id"])
                 for cardList in cardsList:
-                    # if classItems is empty code will not execute so need an if
-                    for card in classItems:
-                        if cardList["id"] == card.id:
-                            found = True
-                            break
-                        else:
-                            found = False
-                    if found == False:
-                        date = datetime.strptime(
-                            cardList["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                        )
-                        # create the class items
-                        item = Item.from_trello_card(cardList, obj)
-
-                        classItems.append(item)
+                    item = Item.from_trello_card(cardList, obj)
+                    classItems.append(item)
     except requests.exceptions.RequestException as exception:
         print(f"An error occured: {exception}")
         classItems = []

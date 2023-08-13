@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, jsonify, session
+from flask import Flask, render_template, request, redirect
 
 from todo_app.flask_config import Config
 
 from .data.trello_items import *
+
+from .data.session_items import *
 
 from datetime import datetime
 
@@ -23,6 +25,8 @@ def render_cards(id):
     cardsList = get_cards(id)
     cardsList.sort(key=lambda x: x.status)
     boardLists = get_boardLists(id)
+    # add to session items
+    save_board_id(id)
 
     return render_template(
         "index.html",
@@ -35,9 +39,9 @@ def render_cards(id):
 
 @app.route("/add", methods=["POST"])
 def add_new_item():
-    boardId = request.form.get("board_id")
+    boardId = session["boardID"]
     inputItem = request.form.get("inputItem")
-    selectedList = request.form.getlist("selectedList")[0]
+    selectedList = request.form.get("selectedList")
     itemDescription = request.form.get("itemDescription")
     dueDate = request.form.get("dueDate")
     date_object = datetime.strptime(dueDate, "%d-%m-%y").date()
@@ -49,7 +53,7 @@ def add_new_item():
 
 @app.route("/update", methods=["POST"])
 def update_item():
-    boardId = request.form.get("board_id")
+    boardId = session["boardID"]
     cardId = request.form.get("card_id")
     listId = request.form.get("updateList")
     update_card(cardId, listId)
@@ -59,7 +63,7 @@ def update_item():
 
 @app.route("/delete", methods=["POST"])
 def delete_an_item():
-    boardId = request.form.get("board_id")
+    boardId = session["boardID"]
     cardId = request.form.get("card_id")
     delete_card(cardId)
     return redirect(f"/{boardId}")

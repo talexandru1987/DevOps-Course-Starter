@@ -95,7 +95,6 @@ def get_boardLists(id):
 # get cards on a board
 def get_cards(id):
     classItems = []
-    found = False
 
     try:
         # get all lists for the board

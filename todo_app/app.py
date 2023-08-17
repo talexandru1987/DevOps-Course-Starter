@@ -8,7 +8,7 @@ from .data.session_items import *
 
 from datetime import datetime
 
-from .data.viewModel import *
+from .data.view_model import *
 
 app = Flask(__name__)
 app.config.from_object(Config())
@@ -24,15 +24,16 @@ def index():
 @app.route("/<id>")
 def render_cards(id):
     status = False
-    cardsList = ViewModel(get_cards(id)).items
-    cardsList.sort(key=lambda x: x.status)
+    allCardsModel = ViewModel(get_cards(id))
     boardLists = get_boardLists(id)
     # add to session items
     save_board_id(id)
 
     return render_template(
         "index.html",
-        cardsList=cardsList,
+        doneCardsList=allCardsModel.done_items,
+        toDoCardsList=allCardsModel.todo_items,
+        doingCardsList=allCardsModel.doing_items,
         status=status,
         boardLists=boardLists,
         boardId=id,

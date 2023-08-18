@@ -94,3 +94,25 @@ Whe the app starts the user will be presented with
 dropdawn option containing the available boards on
 their Trello account. After choosing a board the
 app will render all the cards on the board.
+
+### Testing
+
+The application's tests, along with their
+respective requirements, reside within the `test`
+directory located at the project root.
+Specifically:
+
+- **Tests:** You can find the tests in the
+  `test_view_model.py` file.
+- **Fixtures:** Configuration for fixtures is
+  housed in `conftest.py`.
+
+For executing the tests, ensure that `pytest` is
+installed. It's imperative to ensure consistent
+environments between `pytest` and `poetry`. Hence,
+kindly invoke the tests using:
+
+```bash
+poetry run pytest
+
+```

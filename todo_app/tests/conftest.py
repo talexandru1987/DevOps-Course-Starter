@@ -41,11 +41,11 @@ testData = [
         "card": {
             "id": "4",
             "name": "Test1",
-            "dateLastActivity": "2023-08-26T00:00:00.000Z",
+            "dateLastActivity": "2023-08-27T00:00:00.000Z",
             "due": "2023-08-26T00:00:00.000Z",
             "desc": "card4",
         },
-        "list": {"name": "To Do"},
+        "list": {"name": "Done"},
     },
 ]
 

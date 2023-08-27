@@ -183,3 +183,41 @@ def delete_card(cardId):
         response = False
 
     return response
+
+
+# create a new board
+def create_board(boardName):
+    if boardName:
+        searchUrl = baseUrl + "boards/"
+        query = get_query()
+        query["name"] = boardName
+
+        try:
+            response = requests.request("POST", searchUrl, params=query)
+            response.raise_for_status()
+            response = response.json()["id"]
+        except requests.exceptions.RequestException as exception:
+            print(f"An error occured: {exception}")
+            response = False
+    else:
+        response = False
+    return response
+
+
+# delete a board
+def delete_board(boardId):
+    if boardId:
+        searchUrl = baseUrl + f"boards/{boardId}"
+        query = get_query()
+
+        try:
+            response = requests.request("DELETE", searchUrl, params=query)
+            response.raise_for_status()
+            response = response.json()
+        except requests.exceptions.RequestException as exception:
+            print(f"An error occured: {exception}")
+            response = False
+    else:
+        response = False
+
+    return response

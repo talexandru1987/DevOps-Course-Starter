@@ -13,13 +13,13 @@ def save_board_id(id):
     return id
 
 
-def save_board_lists(id):
+def save_board_lists(boardLists):
     """
-    Saved the board id to the session item.
+    Saved the lists attached to the current board to current session.
 
     Returns:
        The saved id.
     """
-    session["boardLists"] = id
+    session["boardLists"] = boardLists
 
-    return id
+    return boardLists

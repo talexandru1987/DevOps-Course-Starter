@@ -11,3 +11,15 @@ def save_board_id(id):
     session["boardID"] = id
 
     return id
+
+
+def save_board_lists(boardLists):
+    """
+    Saved the lists attached to the current board to current session.
+
+    Returns:
+       The saved id.
+    """
+    session["boardLists"] = boardLists
+
+    return boardLists

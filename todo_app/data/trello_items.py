@@ -1,12 +1,11 @@
 import requests
 import os
-from dotenv import load_dotenv
 from datetime import datetime
+
 from .session_items import *
 
-load_dotenv()
+
 # globals
-query = {"key": os.getenv("TRELLO_KEY"), "token": os.getenv("TRELLO_TOKEN")}
 baseUrl = "https://api.trello.com/1/"
 headers = {"Accept": "application/json"}
 
@@ -35,9 +34,12 @@ class Item:
         lastActiveDate = datetime.strptime(
             card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
         ).strftime("%d/%m/%y")
-        dueDate = datetime.strptime(card["due"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime(
-            "%d/%m/%y"
-        )
+        if card.get("due"):
+            dueDate = datetime.strptime(card["due"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime(
+                "%d/%m/%y"
+            )
+        else:
+            dueDate = None
 
         return cls(
             card["id"],
@@ -49,12 +51,20 @@ class Item:
         )
 
 
+def get_query():
+    return {
+        "key": os.environ.get("TRELLO_KEY"),
+        "token": os.environ.get("TRELLO_TOKEN"),
+    }
+
+
 # get boards avaialble to the user
 def get_boards():
     searchUrl = baseUrl + "members/me/boards?fields=name"
-
     try:
-        response = requests.request("GET", searchUrl, headers=headers, params=query)
+        response = requests.request(
+            "GET", searchUrl, headers=headers, params=get_query()
+        )
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
@@ -68,7 +78,9 @@ def get_list_cards(id):
     searchUrl = baseUrl + f"lists/{id}/cards"
 
     try:
-        response = requests.request("GET", searchUrl, headers=headers, params=query)
+        response = requests.request(
+            "GET", searchUrl, headers=headers, params=get_query()
+        )
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
@@ -82,7 +94,9 @@ def get_boardLists(id):
     searchUrl = f"{baseUrl}boards/{id}/lists"
 
     try:
-        response = requests.request("GET", searchUrl, headers=headers, params=query)
+        response = requests.request(
+            "GET", searchUrl, headers=headers, params=get_query()
+        )
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
@@ -95,11 +109,13 @@ def get_boardLists(id):
 # get cards on a board
 def get_cards(id):
     classItems = []
-    found = False
 
     try:
         # get all lists for the board
         boardLists = get_boardLists(id)
+
+        # add to session items
+        save_board_lists(boardLists)
 
         # get the cards for each list
         if len(boardLists) > 0:
@@ -162,11 +178,49 @@ def delete_card(cardId):
     searchUrl = baseUrl + f"cards/{cardId}"
 
     try:
-        response = requests.request("DELETE", searchUrl, params=query)
+        response = requests.request("DELETE", searchUrl, params=get_query())
         response.raise_for_status()
         response = response.json()
     except requests.exceptions.RequestException as exception:
         print(f"An error occured: {exception}")
+        response = False
+
+    return response
+
+
+# create a new board
+def create_board(boardName):
+    if boardName:
+        searchUrl = baseUrl + "boards/"
+        query = get_query()
+        query["name"] = boardName
+
+        try:
+            response = requests.request("POST", searchUrl, params=query)
+            response.raise_for_status()
+            response = response.json()["id"]
+        except requests.exceptions.RequestException as exception:
+            print(f"An error occured: {exception}")
+            response = False
+    else:
+        response = False
+    return response
+
+
+# delete a board
+def delete_board(boardId):
+    if boardId:
+        searchUrl = baseUrl + f"boards/{boardId}"
+        query = get_query()
+
+        try:
+            response = requests.request("DELETE", searchUrl, params=query)
+            response.raise_for_status()
+            response = response.json()
+        except requests.exceptions.RequestException as exception:
+            print(f"An error occured: {exception}")
+            response = False
+    else:
         response = False
 
     return response

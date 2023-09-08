@@ -34,9 +34,12 @@ class Item:
         lastActiveDate = datetime.strptime(
             card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
         ).strftime("%d/%m/%y")
-        dueDate = datetime.strptime(card["due"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime(
-            "%d/%m/%y"
-        )
+        if card.get("due"):
+            dueDate = datetime.strptime(card["due"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime(
+                "%d/%m/%y"
+            )
+        else:
+            dueDate = None
 
         return cls(
             card["id"],

@@ -34,8 +34,6 @@ class ViewModel:
                 self._items,
             )
         )
-        test1 = test[0].status
-        test2 = test[0].date
         return list(
             filter(
                 lambda item: item.status == "Done" and self._is_today(item.date),

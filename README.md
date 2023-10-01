@@ -116,3 +116,28 @@ kindly invoke the tests using:
 poetry run pytest
 
 ```
+
+### Provision a VM from an Asible Control Node
+
+1. Create the files todoapp.service, .env.j2,
+   alex-ansible-playbook.yml and
+   alex-inventory.txt in the Controler Node
+
+2. Update the files with the relevan details for
+   your VM:
+   - .env.j2 : update the path of the poetry
+     install file if needed
+   - alex-inventory.txt : add the ip addresses for
+     the VM's in scope
+3. Run the Ansible playboak in the Controle node
+
+```
+ansible-playbook alex-ansible-playbook.yml -i alex-invetory
+
+```
+
+4.  when running the playbook you will be asked
+    for the access tokens
+
+5.  Navigate to http://host.ip.address:5000/ to
+    see the output

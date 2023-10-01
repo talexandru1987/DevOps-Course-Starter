@@ -48,11 +48,11 @@
   vars_prompt:
     - name: key
       prompt: "Enter the trello key"
-      private: no
+      private: yes
 
     - name: token
       prompt: "Enter the trello token"
-      private: no
+      private: yes
   tasks:
     - name: Copy .env file using template
       ansible.builtin.template:

@@ -141,3 +141,53 @@ ansible-playbook alex-ansible-playbook.yml -i alex-invetory
 
 5.  Navigate to http://host.ip.address:5000/ to
     see the output
+
+### Creating a production or development Docker image
+
+The Dockerfile contains the multi stage build
+sequence to create a production or development
+image using Docker
+
+## Production Docker image build
+
+1. Build the image using:
+
+```
+docker build --target production --tag todo-app:prod .
+
+```
+
+2. Run the image using:
+
+```
+docker run --env-file .env -p 8000:8000 todo-app:prod .
+
+```
+
+## Development Docker image build using docker commands
+
+1. Build the image using:
+
+```
+docker build --target development --tag todo-app:dev .
+
+```
+
+2. To use a bind mount when running the container
+   and make the “todo_app” directory on the host
+   machine available as a mounted directory. Build
+   by using the following syntax:
+
+```
+docker run --env-file ./.env -p 5000:5000 --mount type=bind,source="$(pwd)"/todo_app,target=/app/todo_app todo-app:dev
+
+```
+
+## Development Docker image build using docker compose
+
+1. Build the image using:
+
+```
+docker compose up
+
+```

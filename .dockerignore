@@ -1,0 +1,12 @@
+#no env file
+.env
+
+.venv
+.git
+.vscode
+.pytest_catche
+.github
+
+#ansible files
+alex-ansible-playbook.yml
+alex-inventory.txt

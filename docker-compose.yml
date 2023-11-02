@@ -16,7 +16,6 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
-      - todo_app:/app/todo_app
 
   dev-debug:
     image: todo-app:dev

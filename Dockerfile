@@ -5,7 +5,7 @@ ENV POETRY_HOME="/opt/poetry"
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
 # Install poetry
-RUN pip install poetry Flask gunicorn
+RUN pip install poetry
 
 # Set up the working directory
 WORKDIR /app
@@ -21,6 +21,8 @@ FROM base as dependencies
 # Install dependecies withtout the dev dependencies
 RUN poetry install --no-dev
 
+RUN pip install Flask gunicorn
+
 
 # Development stage
 FROM dependencies as development_env
@@ -33,7 +35,7 @@ EXPOSE 5000
 
 
 # Production environment
-FROM base as production
+FROM dependencies as production
 
 #copy the dependencies
 COPY --from=dependencies /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages

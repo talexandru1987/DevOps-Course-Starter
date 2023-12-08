@@ -192,4 +192,4 @@ docker compose up
 
 ```
 
-## Added a CI pipline for push and pull request
+## Added a CI pipline for push and pull request test

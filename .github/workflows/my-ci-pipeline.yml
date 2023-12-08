@@ -17,4 +17,4 @@ jobs:
       - name: run docker image
         run:
           docker run -e TRELLO_KEY=key -e
-          TRELLO_TOKEN=token
+          TRELLO_TOKEN=token test-image

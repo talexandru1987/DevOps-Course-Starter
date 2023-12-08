@@ -191,3 +191,5 @@ docker run --env-file ./.env -p 5000:5000 --mount type=bind,source="$(pwd)"/todo
 docker compose up
 
 ```
+
+## Added a CI pipline for push and pull request

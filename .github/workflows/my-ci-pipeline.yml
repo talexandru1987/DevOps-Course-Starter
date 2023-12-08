@@ -2,10 +2,10 @@ name: Continuous Integration
 on:
   push:
     paths-ignore:
-      - "todo_app/README.md"
+      - "README.md"
   pull_request:
     paths-ignore:
-      - "todo_app/README.md"
+      - "README.md"
 
 jobs:
   build:

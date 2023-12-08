@@ -1,4 +1,11 @@
-FROM python:3.9-alpine as base
+# FROM python:3.9-alpine as base
+
+# FROM python:3.8-slim-buster as base
+
+FROM ubuntu:latest as base
+
+#Install python
+RUN apt-get update && apt-get install -y python3 python3-pip
 
 # Set environment variable
 ENV POETRY_HOME="/opt/poetry"
@@ -67,3 +74,9 @@ ENV FLASK_RUN_RELOAD=1
 
 # Expose the flask development port
 EXPOSE 5000
+
+
+# # Test environment
+FROM dependencies as test
+
+ENTRYPOINT poetry run pytest

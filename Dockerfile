@@ -79,4 +79,5 @@ EXPOSE 5000
 # # Test environment
 FROM dependencies as test
 
-ENTRYPOINT poetry run pytest
+
+ENTRYPOINT poetry run pytest todo_app/tests

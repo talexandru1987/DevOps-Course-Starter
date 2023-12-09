@@ -4,6 +4,9 @@ on:
     paths-ignore:
       - "README.md"
   pull_request:
+    # Only on pull requests to main
+    branches:
+      - main
     paths-ignore:
       - "README.md"
 

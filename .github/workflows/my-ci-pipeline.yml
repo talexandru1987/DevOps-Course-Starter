@@ -26,10 +26,7 @@ jobs:
           test-image .
 
       - name: run docker image
-        run: docker run \
-          -e TRELLO_TOKEN=${{ secrets.TOKEN }} \
-          -e TRELLO_KEY=${{ secrets.KEY }} \
-          test-image
+        run: docker run -e TRELLO_TOKEN=${{ secrets.TOKEN }} -e TRELLO_KEY=${{ secrets.KEY }} test-image
 
   security:
     runs-on: ubuntu-latest

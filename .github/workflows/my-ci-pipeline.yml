@@ -22,8 +22,7 @@ jobs:
       - run: echo Hello Alexandru
 
       - name: build docker image
-        run: docker build --target test --tag
-          test-image .
+        run: docker build --target test --tag test-image .
 
       - name: run docker image
         run: docker run -e TRELLO_TOKEN=${{ secrets.TOKEN }} -e TRELLO_KEY=${{ secrets.KEY }} test-image

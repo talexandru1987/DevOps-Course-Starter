@@ -192,4 +192,24 @@ docker compose up
 
 ```
 
-## Added a CI pipline
+## CI pipline trigger
+
+The settings for the CI pipline are included in:
+
+```
+.github/workflows/my-ci-pipeline.yml
+
+```
+
+The CI pipline will trigger if:
+
+1. There is a push request
+2. There is a pull request with the main branch
+3. It's Sunday at 00:00
+
+The CI pipline will not trigger on push or pull request if the changes involve only the README.md file
+
+When running the CI pipline will:
+
+1. Run all the unit and end to end tests
+2. Send the code to Snyk to check for vulnerabilities

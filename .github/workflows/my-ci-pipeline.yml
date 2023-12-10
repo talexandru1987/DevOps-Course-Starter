@@ -9,6 +9,9 @@ on:
       - main
     paths-ignore:
       - "README.md"
+  schedule:
+    # Run every Sunday at 00:00 UTC
+    - cron: "0 0 * * 0"
 
 jobs:
   build:
@@ -23,7 +26,10 @@ jobs:
           test-image .
 
       - name: run docker image
-        run: docker run test-image
+        run: docker run \
+          -e TRELLO_TOKEN=${{ secrets.TOKEN }} \
+          -e TRELLO_KEY=${{ secrets.KEY }} \
+          test-image
 
   security:
     runs-on: ubuntu-latest

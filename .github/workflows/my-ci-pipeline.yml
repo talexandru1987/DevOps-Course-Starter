@@ -19,7 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: echo Hello Alexandru
 
       - name: build docker image
         run: docker build --target test --tag test-image .

@@ -1,6 +1,3 @@
-# FROM python:3.9-alpine as base
-
-# FROM python:3.8-slim-buster as base
 
 FROM ubuntu:latest as base
 

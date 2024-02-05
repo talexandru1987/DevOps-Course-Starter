@@ -1,0 +1,43 @@
+name: Continuous Integration
+on:
+  push:
+    paths-ignore:
+      - "README.md"
+  pull_request:
+    # Only on pull requests to main
+    branches:
+      - main
+    paths-ignore:
+      - "README.md"
+  schedule:
+    # Run every Sunday at 00:00 UTC
+    - cron: "0 0 * * 0"
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: build docker image
+        run: docker build --target test --tag test-image .
+
+      - name: run docker image unit tests
+        run: docker run --entrypoint poetry test-image run pytest todo_app/tests
+
+      - name: run docker image e2e tests
+        run: docker run -e TRELLO_TOKEN=${{ secrets.TOKEN }} -e TRELLO_KEY=${{ secrets.KEY }} -e SECRET_KEY=${{secrets.SECRET_KEY}} --entrypoint poetry test-image run pytest todo_app/tests_e2e
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/python@master
+        #continue even if vulnerabilities are found
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor

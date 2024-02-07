@@ -2,7 +2,7 @@
 FROM ubuntu:latest as base
 
 #Install python
-RUN apt-get update && apt-get install -y python3 python3-pip
+RUN apt-get update && apt-get install -y python3.9 python3-pip
 
 # Set environment variable
 ENV POETRY_HOME="/opt/poetry"
@@ -25,7 +25,6 @@ FROM base as dependencies
 # Install dependecies withtout the dev dependencies
 RUN poetry install --no-dev
 
-RUN pip install Flask gunicorn
 
 
 # Development stage
@@ -41,14 +40,9 @@ EXPOSE 5000
 # Production environment
 FROM dependencies as production
 
-#copy the dependencies
-COPY --from=dependencies /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
-
-#copy the application code from the dependencies stage
-COPY --from=dependencies /app /app 
 
 # Set entry point
-ENTRYPOINT ["gunicorn", "-b", "0.0.0.0:8000", "todo_app.app:create_app()"]
+ENTRYPOINT ["poetry", "run", "gunicorn", "-b", "0.0.0.0:8000", "todo_app.app:create_app()"]
 
 #Expose the port
 EXPOSE 8000
@@ -61,7 +55,7 @@ FROM development_env as development
 WORKDIR /app
 
 # Set the entrypoint for the development environment
-ENTRYPOINT ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+ENTRYPOINT ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--port=5000"]
 
 # Enable Flask debug mode
 ENV FLASK_ENV=development

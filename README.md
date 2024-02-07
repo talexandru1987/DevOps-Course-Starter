@@ -213,3 +213,26 @@ When running the CI pipline will:
 
 1. Run all the unit and end to end tests
 2. Send the code to Snyk to check for vulnerabilities
+
+## Put Container Image on Docker Hub registry
+
+Build the docker image where "yourID" is your docker id. If you need to use the development image change the string "prod" to "dev":
+
+```
+docker build --target production --tag yourID/todo-app:prod .
+
+```
+
+Make shure you are connected to docker by using:
+
+```
+docker login
+
+```
+
+Push the image by using:
+
+```
+docker push yourID/todo-app:prod
+
+```

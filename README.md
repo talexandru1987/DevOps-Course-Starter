@@ -236,3 +236,51 @@ Push the image by using:
 docker push yourID/todo-app:prod
 
 ```
+
+## Create Azure WebApp
+
+Portal:
+
+Create a Resource -> Web App
+Select your project resource group.
+In the “Publish” field, select “Docker Container”
+Configure a service plan.
+On the next screen, select Docker Hub in the “Image Source” field, and enter the details of your image.
+
+CLI:
+
+First create an App Service Plan:
+
+```
+az appservice plan create --resource-group <resource_group_name> -n <appservice_plan_name> --sku B1 --is-linux
+```
+
+Then create the Web App:
+
+```
+az webapp create --resource-group <resource_group_name> --plan <appservice_plan_name> --name <webapp_name> --deployment-container-image-name docker.io/<dockerhub_username>/<container-image-name>:latest
+
+```
+
+## Setup environment variables from your .env file
+
+Portal:
+Settings -> Configuration in the Portal
+Add all the environment variables as “New application setting”
+
+CLI
+Enter them individually via
+
+```
+az webapp config appsettings set -g <resource_group_name> -n <webapp_name> --settings FLASK_APP=todo_app/app.
+
+```
+
+The app works on port 8000, so create a “New application setting” called WEBSITES_PORT with the value 8000
+
+## Deployed app
+
+`````
+https://anothertodo.azurewebsites.net/
+````
+`````

@@ -1,11 +1,8 @@
-# FROM python:3.9-alpine as base
-
-# FROM python:3.8-slim-buster as base
 
 FROM ubuntu:latest as base
 
 #Install python
-RUN apt-get update && apt-get install -y python3 python3-pip
+RUN apt-get update && apt-get install -y python3.9 python3-pip
 
 # Set environment variable
 ENV POETRY_HOME="/opt/poetry"
@@ -28,7 +25,6 @@ FROM base as dependencies
 # Install dependecies withtout the dev dependencies
 RUN poetry install --no-dev
 
-RUN pip install Flask gunicorn
 
 
 # Development stage
@@ -44,14 +40,9 @@ EXPOSE 5000
 # Production environment
 FROM dependencies as production
 
-#copy the dependencies
-COPY --from=dependencies /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
-
-#copy the application code from the dependencies stage
-COPY --from=dependencies /app /app 
 
 # Set entry point
-ENTRYPOINT ["gunicorn", "-b", "0.0.0.0:8000", "todo_app.app:create_app()"]
+ENTRYPOINT ["poetry", "run", "gunicorn", "-b", "0.0.0.0:8000", "todo_app.app:create_app()"]
 
 #Expose the port
 EXPOSE 8000
@@ -64,7 +55,7 @@ FROM development_env as development
 WORKDIR /app
 
 # Set the entrypoint for the development environment
-ENTRYPOINT ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+ENTRYPOINT ["poetry", "run", "flask", "run", "--host=0.0.0.0", "--port=5000"]
 
 # Enable Flask debug mode
 ENV FLASK_ENV=development
@@ -89,14 +80,6 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
   && rm /etc/apt/sources.list.d/google-chrome.list \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
-RUN CHROME_MAJOR_VERSION=$(google-chrome --version | sed -E "s/.* ([0-9]+)(\.[0-9]+){3}.*/\1/") \
-  && CHROME_VERSIONS_JSON=$(wget --no-verbose -O - "https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json") \
-  && CHROME_DRIVER_VERSION=$(echo $CHROME_VERSIONS_JSON | jq -r ".milestones.\"${CHROME_MAJOR_VERSION}\".version") \
-  && echo "Using chromedriver version: "$CHROME_DRIVER_VERSION \
-  && wget --no-verbose -O /tmp/chromedriver_linux64.zip https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${CHROME_DRIVER_VERSION}/linux64/chromedriver-linux64.zip \
-  && unzip /tmp/chromedriver_linux64.zip -d /usr/bin \
-  && mv /usr/bin/chromedriver-linux64/* /usr/bin \
-  && rm -r /tmp/chromedriver_linux64.zip /usr/bin/chromedriver-linux64/ \
-  && chmod 755 /usr/bin/chromedriver
+
 
 ENTRYPOINT poetry run pytest

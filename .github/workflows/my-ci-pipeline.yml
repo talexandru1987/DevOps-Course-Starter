@@ -46,6 +46,7 @@ jobs:
     name: Deploy to production
     runs-on: ubuntu-latest
     needs: [build]
+    if: github.ref == 'refs/heads/main'
     steps:
       - run: echo Publishing!
 
@@ -64,9 +65,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: talexandru87/app:latest
+      - name: Build image
+        run: docker run -e TRELLO_TOKEN=${{ secrets.TOKEN }} -e TRELLO_KEY=${{ secrets.KEY }} -e SECRET_KEY=${{secrets.SECRET_KEY}} --tag talexandru87/todo:prod
+
+      - name: Push to Docker Hub
+        run: docker push talexandru87/todo:prod
+
+      - name: Azure Update
+        run: curl -dH -X POST '$'${{ secrets.AZURE_HOOK_TODO }}

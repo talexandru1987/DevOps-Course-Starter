@@ -279,8 +279,12 @@ az webapp config appsettings set -g <resource_group_name> -n <webapp_name> --set
 The app works on port 8000, so create a “New application setting” called WEBSITES_PORT with the value 8000
 
 ## Deployed app
-
-`````
+```
 https://anothertodo.azurewebsites.net/
-````
-`````
+
+```
+
+## Continuous Deployment
+
+When there is a push to Main and the pipeline test passes, the new code is automatically deployed to Azure.
+

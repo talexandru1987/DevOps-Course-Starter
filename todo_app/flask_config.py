@@ -1,6 +1,7 @@
 import os
 
 
+
 class Config:
     def __init__(self):
         """Base configuration variables."""

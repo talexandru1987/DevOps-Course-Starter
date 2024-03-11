@@ -18,7 +18,7 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: build docker image
         run: docker build --target test --tag test-image .
@@ -53,9 +53,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -66,10 +63,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build image
-        run: docker run -e TRELLO_TOKEN=${{ secrets.TOKEN }} -e TRELLO_KEY=${{ secrets.KEY }} -e SECRET_KEY=${{secrets.SECRET_KEY}} --tag talexandru87/todo:prod
+        run: docker build --target production --tag todo-app:prod .
 
       - name: Push to Docker Hub
-        run: docker push talexandru87/todo:prod
+        run: docker push talexandru87/todo-app:prod
 
       - name: Azure Update
-        run: curl -dH -X POST '$'${{ secrets.AZURE_HOOK_TODO }}
+        run: curl -dH -X POST '${{ secrets.AZURE_HOOK_TODO }}'

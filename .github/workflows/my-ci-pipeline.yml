@@ -72,4 +72,4 @@ jobs:
         run: docker push talexandru87/todo:prod
 
       - name: Azure Update
-        run: curl -dH -X POST '$'${{ secrets.AZURE_HOOK_TODO }}
+        run: curl -dH -X POST '${{ secrets.AZURE_HOOK_TODO }}'

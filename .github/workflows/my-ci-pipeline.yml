@@ -48,8 +48,6 @@ jobs:
     needs: [build]
     if: github.ref == 'refs/heads/main'
     steps:
-      - run: echo Publishing!
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -66,7 +64,7 @@ jobs:
         run: docker build --target production --tag todo-app:prod .
 
       - name: Push to Docker Hub
-        run: docker push talexandru87/todo-app:prod
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:prod
 
       - name: Azure Update
         run: curl -dH -X POST '${{ secrets.AZURE_HOOK_TODO }}'

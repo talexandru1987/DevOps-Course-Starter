@@ -288,3 +288,27 @@ https://anothertodo.azurewebsites.net/
 
 When there is a push to Main and the pipeline test passes, the new code is automatically deployed to Azure.
 
+## Connecting to CosmosDB
+
+
+In your terminal, ensure that the Poetry package manager is available by using this command in your terminal:
+
+```
+poetry shell
+```
+
+Open the interpreter in your terminal by typing:
+
+``` 
+python
+```
+
+In your interpreter, type the following commands and replace 'connection string' with your actual database connection string found in Azure:
+
+```
+import pymongo
+client = pymongo.MongoClient("connection string")
+client.list_database_names()
+```
+
+ 

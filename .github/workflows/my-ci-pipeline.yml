@@ -61,7 +61,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build image
-        run: docker build --target production --tag todo-app:prod .
+        run: docker build --target production --tag ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:prod .
 
       - name: Push to Docker Hub
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-app:prod

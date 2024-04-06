@@ -48,8 +48,11 @@ def create_app():
         itemDescription = request.form.get("itemDescription")
         dueDate = request.form.get("dueDate")
         date_object = datetime.strptime(dueDate, "%d-%m-%y").date()
+        # Convert the datetime.date object to a datetime.datetime object by adding a default time
+        due_datetime = datetime.combine(date_object, datetime.min.time())
+
         if inputItem:
-            add_card(selectedList, inputItem, itemDescription, date_object)
+            add_card(selectedList, inputItem, itemDescription, due_datetime)
 
         return redirect(f"/{boardId}")
 

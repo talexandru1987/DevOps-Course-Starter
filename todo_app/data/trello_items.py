@@ -1,8 +1,53 @@
 import requests
 import os
 from datetime import datetime
+from pymongo import MongoClient
 
 from .session_items import *
+
+
+#Get Connection sTrign for Mongo
+
+def get_connection_string():
+    return os.environ.get("CONNECTION_STRING")
+
+
+#Globals
+client= MongoClient(get_connection_string())
+db = client['ToDo-Database']
+collection = db['todo-boards']
+
+
+
+# add a new card to the board
+def add_card(listId, cardName, desc, due):
+    
+
+    card_document = {
+        "listId": listId,
+        "name": cardName,
+        "desc": desc,
+        "due": due,
+        "boards" : "TestBoard",
+        "updated": datetime.now()
+    }
+    
+    try:
+        # Insert the document into the collection
+        result = collection.insert_one(card_document)
+        response = {"_id": str(result.inserted_id)}
+        print (response)
+    except Exception as exception:
+        print(f"An error occured: {exception}")
+        response = False
+
+    return response
+
+
+
+
+
+
 
 
 # globals
@@ -130,27 +175,27 @@ def get_cards(id):
     return classItems
 
 
-# add a new card to the board
-def add_card(listId, cardName, desc, due):
-    searchUrl = baseUrl + "cards"
+# # add a new card to the board
+# def add_card(listId, cardName, desc, due):
+#     searchUrl = baseUrl + "cards"
 
-    addQuery = {
-        "key": os.getenv("TRELLO_KEY"),
-        "token": os.getenv("TRELLO_TOKEN"),
-        "idList": listId,
-        "name": cardName,
-        "desc": desc,
-        "due": due,
-    }
-    try:
-        response = requests.request("POST", searchUrl, headers=headers, params=addQuery)
-        response.raise_for_status()
-        response = response.json()
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        response = False
+#     addQuery = {
+#         "key": os.getenv("TRELLO_KEY"),
+#         "token": os.getenv("TRELLO_TOKEN"),
+#         "idList": listId,
+#         "name": cardName,
+#         "desc": desc,
+#         "due": due,
+#     }
+#     try:
+#         response = requests.request("POST", searchUrl, headers=headers, params=addQuery)
+#         response.raise_for_status()
+#         response = response.json()
+#     except requests.exceptions.RequestException as exception:
+#         print(f"An error occured: {exception}")
+#         response = False
 
-    return response
+#     return response
 
 
 # update a card on the board

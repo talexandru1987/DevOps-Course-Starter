@@ -11,50 +11,15 @@ from .session_items import *
 def get_connection_string():
     return os.environ.get("CONNECTION_STRING")
 
+def get_collection(databaseNem, collectionName):
+    return databaseNem[collectionName]
 
 #Globals
 client= MongoClient(get_connection_string())
 db = client['ToDo-Database']
-collection = db['todo-boards']
+collection = get_collection(db, 'todo-boards')
 
-
-
-# add a new card to the board
-def add_card(listId, cardName, desc, due):
-    
-
-    card_document = {
-        "listId": listId,
-        "name": cardName,
-        "desc": desc,
-        "due": due,
-        "boards" : "TestBoard",
-        "updated": datetime.now()
-    }
-    
-    try:
-        # Insert the document into the collection
-        result = collection.insert_one(card_document)
-        response = {"_id": str(result.inserted_id)}
-        print (response)
-    except Exception as exception:
-        print(f"An error occured: {exception}")
-        response = False
-
-    return response
-
-
-
-
-
-
-
-
-# globals
-baseUrl = "https://api.trello.com/1/"
-headers = {"Accept": "application/json"}
-
-
+#An item contains all the data for 1 card
 class Item:
     def __init__(
         self,
@@ -75,25 +40,82 @@ class Item:
         )
 
     @classmethod
-    def from_trello_card(cls, card, list):
-        lastActiveDate = datetime.strptime(
-            card["dateLastActivity"], "%Y-%m-%dT%H:%M:%S.%fZ"
-        ).strftime("%d/%m/%y")
+    def from_trello_card(cls, card):
+        listName = "To Do"
+        lastActiveDate = card["dateLastActivity"].strftime("%d/%m/%y")
         if card.get("due"):
-            dueDate = datetime.strptime(card["due"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime(
+            dueDate = card["due"].strftime(
                 "%d/%m/%y"
             )
         else:
             dueDate = None
 
+        #get list name
+        if card["listId"] == "657c834ff1b03a6ddfeadc94":
+            listName = "Done"
+        elif card["listId"] == "657c834ff1b03a6ddfeadc93":
+            listName = "Doing"
+
+
         return cls(
-            card["id"],
+            card["_id"],
             card["name"],
             lastActiveDate,
             dueDate,
             card["desc"],
-            list["name"],
+            listName,
         )
+
+
+# Add a new document to the DB
+def add_card(listId, cardName, desc, due):
+    
+    card_document = {
+        "listId": listId,
+        "name": cardName,
+        "due": due,
+        "dateLastActivity": datetime.now(),
+        "desc": desc,
+        "boards" : "TestBoard"
+    }
+    
+    try:
+        # Insert the document into the collection
+        result = collection.insert_one(card_document)
+        response = {"_id": str(result.inserted_id)}
+        print (response)
+    except Exception as exception:
+        print(f"An error occured: {exception}")
+        response = False
+
+    return response
+
+# get cards on a board
+def get_cards(id):
+    #get all the documents
+    documentsList = collection.find({})
+    classItems = []
+
+    try:
+        for document in documentsList:
+            item = Item.from_trello_card(document)
+            classItems.append(item)
+
+    except requests.exceptions.RequestException as exception:
+        print(f"An error occured: {exception}")
+        classItems = []
+    return classItems
+
+
+
+
+
+
+# globals
+baseUrl = "https://api.trello.com/1/"
+headers = {"Accept": "application/json"}
+
+
 
 
 def get_query():
@@ -119,60 +141,64 @@ def get_boards():
 
 
 # get the cards in a list
-def get_list_cards(id):
-    searchUrl = baseUrl + f"lists/{id}/cards"
+# def get_list_cards(id):
+#     searchUrl = baseUrl + f"lists/{id}/cards"
 
-    try:
-        response = requests.request(
-            "GET", searchUrl, headers=headers, params=get_query()
-        )
-        response.raise_for_status()
-        response = response.json()
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        response = None
-    return response
+#     try:
+#         response = requests.request(
+#             "GET", searchUrl, headers=headers, params=get_query()
+#         )
+#         response.raise_for_status()
+#         response = response.json()
+    
+#     except requests.exceptions.RequestException as exception:
+#         print(f"An error occured: {exception}")
+#         response = None
+#     return response
 
 
 # get the lists on  board
-def get_boardLists(id):
-    searchUrl = f"{baseUrl}boards/{id}/lists"
+# def get_boardLists(id):
+#     searchUrl = f"{baseUrl}boards/{id}/lists"
 
-    try:
-        response = requests.request(
-            "GET", searchUrl, headers=headers, params=get_query()
-        )
-        response.raise_for_status()
-        response = response.json()
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        response = None
+#     try:
+#         response = requests.request(
+#             "GET", searchUrl, headers=headers, params=get_query()
+#         )
+#         response.raise_for_status()
+#         response = response.json()
+#     except requests.exceptions.RequestException as exception:
+#         print(f"An error occured: {exception}")
+#         response = None
 
-    return response
+#     return response
 
 
-# get cards on a board
-def get_cards(id):
-    classItems = []
+# # get cards on a board
+# def get_cards(id):
+#     classItems = []
 
-    try:
-        # get all lists for the board
-        boardLists = get_boardLists(id)
+#     try:
+#         # get all lists for the board
+#         boardLists = get_boardLists(id)
+        
 
-        # add to session items
-        save_board_lists(boardLists)
+#         # add to session items
+#         save_board_lists(boardLists)
 
-        # get the cards for each list
-        if len(boardLists) > 0:
-            for obj in boardLists:
-                cardsList = get_list_cards(obj["id"])
-                for cardList in cardsList:
-                    item = Item.from_trello_card(cardList, obj)
-                    classItems.append(item)
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        classItems = []
-    return classItems
+#         # get the cards for each list
+#         if len(boardLists) > 0:
+#             for obj in boardLists:
+#                 cardsList = get_list_cards(obj["id"])
+#                 print(f"This is the object: ${obj}")
+#                 for cardList in cardsList:
+#                     print(f"This is the cardList: ${obj}")
+#                     item = Item.from_trello_card(cardList, obj)
+#                     classItems.append(item)
+#     except requests.exceptions.RequestException as exception:
+#         print(f"An error occured: {exception}")
+#         classItems = []
+#     return classItems
 
 
 # # add a new card to the board

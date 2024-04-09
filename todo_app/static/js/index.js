@@ -1,11 +1,7 @@
 // target the document elements
-const taskUpdate = document.querySelectorAll(
-  ".taskUpdate"
-);
+const taskUpdate = document.querySelectorAll(".taskUpdate");
 
-const taskDelete = document.querySelectorAll(
-  ".deleteTask"
-);
+const taskDelete = document.querySelectorAll(".deleteTask");
 
 //define the functions
 const updateList = (event) => {
@@ -45,15 +41,11 @@ const deleteItem = (event) => {
 
 //add the event listners
 if (taskUpdate.length > 0) {
-  taskUpdate.forEach((input) =>
-    input.addEventListener("change", updateList)
-  );
+  taskUpdate.forEach((input) => input.addEventListener("change", updateList));
 }
 
 if (taskDelete.length > 0) {
-  taskDelete.forEach((input) =>
-    input.addEventListener("click", deleteItem)
-  );
+  taskDelete.forEach((input) => input.addEventListener("click", deleteItem));
 }
 
 $(document).ready(function () {
@@ -62,3 +54,7 @@ $(document).ready(function () {
     autoclose: true,
   });
 });
+
+const confirmDelete = () => {
+  return confirm("Are you sure you want to delete this board?");
+};

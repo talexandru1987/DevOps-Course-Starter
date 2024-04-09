@@ -4,3 +4,20 @@ hr {
   border-top: 2px solid black;
   margin: 20px 0;
 }
+
+/* Styles for the container */
+.container {
+  margin-top: 20px;
+}
+
+/* Styles for the form containers */
+.form-container {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Padding around columns for better spacing */
+.column-padding {
+  padding: 20px;
+}

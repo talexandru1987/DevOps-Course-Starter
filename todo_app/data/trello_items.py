@@ -17,7 +17,8 @@ def get_collection(databaseNem, collectionName):
 #Globals
 client= MongoClient(get_connection_string())
 db = client['ToDo-Database']
-collection = get_collection(db, 'todo-boards')
+cardsCollection = get_collection(db, 'todo-cards')
+boardsCollection = get_collection(db, 'todo-boards')
 
 #An item contains all the data for 1 card
 class Item:
@@ -67,7 +68,7 @@ class Item:
         )
 
 
-# Add a new document to the DB
+# Add a new document to the DBcard
 def add_card(listId, cardName, desc, due):
     
     card_document = {
@@ -81,9 +82,8 @@ def add_card(listId, cardName, desc, due):
     
     try:
         # Insert the document into the collection
-        result = collection.insert_one(card_document)
+        result = cardsCollection.insert_one(card_document)
         response = {"_id": str(result.inserted_id)}
-        print (response)
     except Exception as exception:
         print(f"An error occured: {exception}")
         response = False
@@ -93,7 +93,7 @@ def add_card(listId, cardName, desc, due):
 # get cards on a board
 def get_cards(id):
     #get all the documents
-    documentsList = collection.find({})
+    documentsList = cardsCollection.find({})
     classItems = []
 
     try:
@@ -106,9 +106,50 @@ def get_cards(id):
         classItems = []
     return classItems
 
+# create a new board
+def create_board(boardName, description):
+    board_document = {
+        "name": boardName,
+        "description": description,
+        "created": datetime.now(),
+        "boards": "1"
+    }
+    
+    try:
+        # Insert the document into the collection
+        result = boardsCollection.insert_one(board_document)
+        response = {"_id": str(result.inserted_id)}
+    except Exception as exception:
+        print(f"An error occured: {exception}")
+        response = False
 
+    return response
 
+#Delete a document from the boards collection
+def delete_board_by_name(boardName):
+    try:
+        # Attempt to delete the document by name
+        result = boardsCollection.delete_one({"name": boardName})
+        
+        if result.deleted_count > 0:
+            print(f"Board '{boardName}' was deleted successfully.")
+            return True
+        else:
+            print(f"No board found with the name '{boardName}'.")
+            return False
+    except Exception as exception:
+        print(f"An error occurred: {exception}")
+        return False
 
+# Get all document from the boards collection
+def get_boards():
+    try:
+        boards = list(boardsCollection.find({}))  
+        return boards  
+    except Exception as exception:
+        print(f"An error occurred: {exception}")
+        return None
+    
 
 
 # globals
@@ -126,18 +167,19 @@ def get_query():
 
 
 # get boards avaialble to the user
-def get_boards():
-    searchUrl = baseUrl + "members/me/boards?fields=name"
-    try:
-        response = requests.request(
-            "GET", searchUrl, headers=headers, params=get_query()
-        )
-        response.raise_for_status()
-        response = response.json()
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        response = None
-    return response
+# def get_boards():
+#     searchUrl = baseUrl + "members/me/boards?fields=name"
+#     try:
+#         response = requests.request(
+#             "GET", searchUrl, headers=headers, params=get_query()
+#         )
+#         response.raise_for_status()
+#         response = response.json()
+#         print(response)
+#     except requests.exceptions.RequestException as exception:
+#         print(f"An error occured: {exception}")
+#         response = None
+#     return response
 
 
 # get the cards in a list
@@ -259,39 +301,39 @@ def delete_card(cardId):
     return response
 
 
-# create a new board
-def create_board(boardName):
-    if boardName:
-        searchUrl = baseUrl + "boards/"
-        query = get_query()
-        query["name"] = boardName
+# # create a new board
+# def create_board(boardName):
+#     if boardName:
+#         searchUrl = baseUrl + "boards/"
+#         query = get_query()
+#         query["name"] = boardName
 
-        try:
-            response = requests.request("POST", searchUrl, params=query)
-            response.raise_for_status()
-            response = response.json()["id"]
-        except requests.exceptions.RequestException as exception:
-            print(f"An error occured: {exception}")
-            response = False
-    else:
-        response = False
-    return response
+#         try:
+#             response = requests.request("POST", searchUrl, params=query)
+#             response.raise_for_status()
+#             response = response.json()["id"]
+#         except requests.exceptions.RequestException as exception:
+#             print(f"An error occured: {exception}")
+#             response = False
+#     else:
+#         response = False
+#     return response
 
 
 # delete a board
-def delete_board(boardId):
-    if boardId:
-        searchUrl = baseUrl + f"boards/{boardId}"
-        query = get_query()
+# def delete_board(boardId):
+#     if boardId:
+#         searchUrl = baseUrl + f"boards/{boardId}"
+#         query = get_query()
 
-        try:
-            response = requests.request("DELETE", searchUrl, params=query)
-            response.raise_for_status()
-            response = response.json()
-        except requests.exceptions.RequestException as exception:
-            print(f"An error occured: {exception}")
-            response = False
-    else:
-        response = False
+#         try:
+#             response = requests.request("DELETE", searchUrl, params=query)
+#             response.raise_for_status()
+#             response = response.json()
+#         except requests.exceptions.RequestException as exception:
+#             print(f"An error occured: {exception}")
+#             response = False
+#     else:
+#         response = False
 
-    return response
+#     return response

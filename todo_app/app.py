@@ -25,8 +25,7 @@ def create_app():
     def render_cards(id):
         status = False
         allCardsModel = ViewModel(get_cards(id))
-
-        boardLists = session["boardLists"]
+        # boardLists = session["boardLists"]
         # add to session items
         save_board_id(id)
 
@@ -36,7 +35,7 @@ def create_app():
             toDoCardsList=allCardsModel.todo_items,
             doingCardsList=allCardsModel.doing_items,
             status=status,
-            boardLists=boardLists,
+            # boardLists=boardLists,
             boardId=id,
         )
 
@@ -71,5 +70,18 @@ def create_app():
         cardId = request.form.get("card_id")
         delete_card(cardId)
         return redirect(f"/{boardId}")
+    
+    @app.route("/addBoard", methods=["POST"])
+    def create_new_board():
+        boardName = request.form.get("inputItem")
+        boardDescription = request.form.get("itemDescription")
+        create_board(boardName,boardDescription )
+        return redirect("/")
+    
+    @app.route("/deleteBoard", methods=["POST"])
+    def delete_board():
+        boardName = request.form.get("deleteItem")
+        delete_board_by_name(boardName)
+        return redirect("/")
 
     return app

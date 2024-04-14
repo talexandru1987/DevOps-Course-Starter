@@ -24,9 +24,11 @@ def create_app():
     @app.route("/<id>")
     def render_cards(id):
         status = False
+
+        #get all cards for the board id
         allCardsModel = ViewModel(get_cards(id))
-        # boardLists = session["boardLists"]
-        # add to session items
+
+        #add to session items
         save_board_id(id)
 
         return render_template(
@@ -35,8 +37,9 @@ def create_app():
             toDoCardsList=allCardsModel.todo_items,
             doingCardsList=allCardsModel.doing_items,
             status=status,
-            # boardLists=boardLists,
             boardId=id,
+            #the list selection for the add card form
+            boardLists =[{"id":"657c834ff1b03a6ddfeadc94", "name": "Done"},{"id":"657c834ff1b03a6ddfeadc93", "name": "Doing"},{"id":"657c834gg1b03a6ddfeadc84", "name": "To Do"}]
         )
 
     @app.route("/add", methods=["POST"])
@@ -51,7 +54,7 @@ def create_app():
         due_datetime = datetime.combine(date_object, datetime.min.time())
 
         if inputItem:
-            add_card(selectedList, inputItem, itemDescription, due_datetime)
+            add_card(selectedList, inputItem, itemDescription, due_datetime, boardId)
 
         return redirect(f"/{boardId}")
 

@@ -69,7 +69,7 @@ class Item:
 
 
 # Add a new document to the DBcard
-def add_card(listId, cardName, desc, due):
+def add_card(listId, cardName, desc, due, board):
     
     card_document = {
         "listId": listId,
@@ -77,7 +77,7 @@ def add_card(listId, cardName, desc, due):
         "due": due,
         "dateLastActivity": datetime.now(),
         "desc": desc,
-        "boards" : "TestBoard"
+        "boards" : [board]
     }
     
     try:
@@ -93,7 +93,7 @@ def add_card(listId, cardName, desc, due):
 # get cards on a board
 def get_cards(id):
     #get all the documents
-    documentsList = cardsCollection.find({})
+    documentsList = cardsCollection.find({"boards": id})
     classItems = []
 
     try:
@@ -128,14 +128,26 @@ def create_board(boardName, description):
 #Delete a document from the boards collection
 def delete_board_by_name(boardName):
     try:
-        # Attempt to delete the document by name
-        result = boardsCollection.delete_one({"name": boardName})
-        
-        if result.deleted_count > 0:
-            print(f"Board '{boardName}' was deleted successfully.")
-            return True
+        # First, find the document to get its _id
+        board = boardsCollection.find_one({"name": boardName}, {"_id": 1})
+        if board:
+            board_id_str = str(board['_id'])
+            # Attempt to delete the document by name
+            result = boardsCollection.delete_one({"_id": board['_id']})
+            
+            if result.deleted_count > 0:
+                print(f"Board '{boardName}' was deleted successfully.")
+
+                # Now, delete all related cards that have this board's _id in their 'boards' property
+                related_cards_result = cardsCollection.delete_many({"boards": {"$in": [board_id_str]}})
+                print(f"Related cards deleted count: {related_cards_result.deleted_count}")
+
+                return True
+            else:
+                print(f"No board found with the name '{boardName}'.")
+                return False
         else:
-            print(f"No board found with the name '{boardName}'.")
+            print(f"No board found with the name '{boardName}', nothing to delete.")
             return False
     except Exception as exception:
         print(f"An error occurred: {exception}")
@@ -150,20 +162,53 @@ def get_boards():
         print(f"An error occurred: {exception}")
         return None
     
+# update a card on the board
+def update_card(boardID, listId):
+    print(listId)
+    try:
+        # The update_one method is used to update a single document.
+        result = cardsCollection.update_one(
+            {"_id": boardID},
+            {"$set": {"listId": listId}}
+        )
+        # Check if the document was found and updated
+        if result.matched_count > 0:
+            if result.modified_count > 0:
+                return {"status": "success", "message": "Document updated."}
+            else:
+                return {"status": "success", "message": "Document already had the specified listId."}
+        else:
+            return {"status": "error", "message": "No document found with the specified _id."}
+    except Exception as exception:
+        print(f"An error occurred: {exception}")
+        return {"status": "error", "message": "An error occurred during the update operation."}
+
+# update a card on the board
+def delete_card(cardId):
+    try:
+        # The delete_one method attempts to delete the first document that matches the provided filter
+        result = cardsCollection.delete_one({"_id": cardId})
+        if result.deleted_count > 0:
+            return {"status": "success", "message": "The document was deleted successfully."}
+        else:
+            return {"status": "error", "message": "No document found with the specified _id or deletion was unsuccessful."}
+    except Exception as exception:
+        print(f"An error occurred: {exception}")
+        return {"status": "error", "message": "An error occurred during the deletion process."}
 
 
-# globals
-baseUrl = "https://api.trello.com/1/"
-headers = {"Accept": "application/json"}
+# # globals
+# baseUrl = "https://api.trello.com/1/"
+# headers = {"Accept": "application/json"}
 
 
 
 
-def get_query():
-    return {
-        "key": os.environ.get("TRELLO_KEY"),
-        "token": os.environ.get("TRELLO_TOKEN"),
-    }
+# def get_query():
+#     return {
+#         "key": os.environ.get("TRELLO_KEY"),
+#         "token": os.environ.get("TRELLO_TOKEN"),
+#     }
 
 
 # get boards avaialble to the user
@@ -266,39 +311,39 @@ def get_query():
 #     return response
 
 
-# update a card on the board
-def update_card(cardId, listId):
-    searchUrl = baseUrl + f"cards/{cardId}"
+# # update a card on the board
+# def update_card(cardId, listId):
+#     searchUrl = baseUrl + f"cards/{cardId}"
 
-    addQuery = {
-        "key": os.getenv("TRELLO_KEY"),
-        "token": os.getenv("TRELLO_TOKEN"),
-        "idList": listId,
-    }
-    try:
-        response = requests.request("PUT", searchUrl, headers=headers, params=addQuery)
-        response.raise_for_status()
-        response = response.json()
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        response = False
+#     addQuery = {
+#         "key": os.getenv("TRELLO_KEY"),
+#         "token": os.getenv("TRELLO_TOKEN"),
+#         "idList": listId,
+#     }
+#     try:
+#         response = requests.request("PUT", searchUrl, headers=headers, params=addQuery)
+#         response.raise_for_status()
+#         response = response.json()
+#     except requests.exceptions.RequestException as exception:
+#         print(f"An error occured: {exception}")
+#         response = False
 
-    return response
+#     return response
 
 
-# update a card on the board
-def delete_card(cardId):
-    searchUrl = baseUrl + f"cards/{cardId}"
+# # update a card on the board
+# def delete_card(cardId):
+#     searchUrl = baseUrl + f"cards/{cardId}"
 
-    try:
-        response = requests.request("DELETE", searchUrl, params=get_query())
-        response.raise_for_status()
-        response = response.json()
-    except requests.exceptions.RequestException as exception:
-        print(f"An error occured: {exception}")
-        response = False
+#     try:
+#         response = requests.request("DELETE", searchUrl, params=get_query())
+#         response.raise_for_status()
+#         response = response.json()
+#     except requests.exceptions.RequestException as exception:
+#         print(f"An error occured: {exception}")
+#         response = False
 
-    return response
+#     return response
 
 
 # # create a new board

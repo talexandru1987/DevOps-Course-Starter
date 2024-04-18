@@ -12,10 +12,10 @@
     {% for obj in boardsList %}
     <li>
       <details>
-        <summary style="cursor: pointer">{{ obj.name }}</summary>
+        <summary id="{{ obj._id }}" style="cursor: pointer">{{ obj.name }}</summary>
         <p>{{ obj.description }}</p>
         <!-- Link to navigate to the board. Adjust href as necessary -->
-        <a href="/{{ obj._id }}">Go to Board</a>
+        <a id="a{{ obj._id }}" href="/{{ obj._id }}">Go to Board</a>
       </details>
     </li>
     {% endfor %}

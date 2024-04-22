@@ -2,7 +2,6 @@
 # print(sys.executable)
 
 # UNIT Tests
-import requests
 from .conftest import *
 from datetime import datetime
 

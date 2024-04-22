@@ -27,8 +27,13 @@ jobs:
         run: docker run --entrypoint poetry test-image run pytest todo_app/tests
 
       - name: run docker image e2e tests
-        run: docker run -e CONNECTION_STRING=${{secrets.AZURE_HOOK_TODO}} -e SECRET_KEY=${{secrets.SECRET_KEY}} --entrypoint poetry test-image run pytest todo_app/tests_e2e
-
+        run: |
+          docker run \
+            -e CONNECTION_STRING=${{ secrets.AZURE_HOOK_TODO }} \
+            -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
+            --entrypoint poetry \
+            test-image \
+            run pytest todo_app/tests_e2e
   security:
     runs-on: ubuntu-latest
     steps:

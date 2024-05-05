@@ -28,12 +28,6 @@ class ViewModel:
 
     @property
     def recent_done_items(self):
-        test = list(
-            filter(
-                lambda item: item.listName == "Done" and self._is_today(item.date),
-                self._items,
-            )
-        )
         return list(
             filter(
                 lambda item: item.listName == "Done" and self._is_today(item.date),

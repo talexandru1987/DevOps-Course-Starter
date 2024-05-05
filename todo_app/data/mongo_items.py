@@ -14,13 +14,16 @@ def get_connection_string():
 def get_collection(databaseNem, collectionName):
     return databaseNem[collectionName]
 
-#Globals
-client= MongoClient(get_connection_string())
-db = client['ToDo-Database']
-cardsCollection = get_collection(db, 'todo-cards')
-boardsCollection = get_collection(db, 'todo-boards')
+#database connection
+class MongoAccess():
+    def __init__(self):
+        conn_str = os.environ.get("CONNECTION_STRING")
+        client= MongoClient(conn_str)
+        db = client['ToDo-Database']
+        self.cardsCollection = db['todo-cards']
+        self.boardsCollection = db['todo-boards']
 
-#An item contains all the data for 1 card
+#One item contains all the data for 1 card
 class Item:
     def __init__(
         self,
@@ -41,7 +44,7 @@ class Item:
         )
 
     @classmethod
-    def from_trello_card(cls, card):
+    def create_card(cls, card):
         lastActiveDate = card["dateLastActivity"].strftime("%d/%m/%y")
         if card.get("due"):
             dueDate = card["due"].strftime(
@@ -71,10 +74,9 @@ class Item:
 # Add a new document to the DBcard
 
 def add_card(listId, cardName, desc, due, board, addedCollection = None):
-    collection = cardsCollection
-    if addedCollection is not None:
-        collection = addedCollection
-   
+    mongo_access = MongoAccess()
+    collection = mongo_access.cardsCollection if addedCollection is None else addedCollection
+
     card_document = {
         "listId": listId,
         "name": cardName,
@@ -96,18 +98,17 @@ def add_card(listId, cardName, desc, due, board, addedCollection = None):
 
 # get cards on a board
 def get_cards(id, addedCollection = None):
+    mongo_access = MongoAccess()
+    collection = mongo_access.cardsCollection if addedCollection is None else addedCollection
 
-    collection = cardsCollection
-    if addedCollection is not None:
-        collection = addedCollection
-    
     #get all the documents
     documentsList = collection.find({"boards": id})
+ 
     classItems = []
 
     try:
         for document in documentsList:
-            item = Item.from_trello_card(document)
+            item = Item.create_card(document)
             classItems.append(item)
 
     except requests.exceptions.RequestException as exception:
@@ -118,10 +119,8 @@ def get_cards(id, addedCollection = None):
 # create a new board
 def create_board(boardName, description, addedCollection = None):
 
-    collection = boardsCollection
-    if addedCollection is not None:
-        collection = addedCollection
-
+    mongo_access = MongoAccess()
+    collection = mongo_access.boardsCollection if addedCollection is None else addedCollection
     board_document = {
         "name": boardName,
         "description": description,
@@ -142,8 +141,9 @@ def create_board(boardName, description, addedCollection = None):
 #Delete a document from the boards collection
 def delete_board_by_name(boardName, addedCollectionCard = None, addedCollectionBoard = None):
 
-    collectionCard= cardsCollection
-    collectionBoard = boardsCollection
+    mongo_access = MongoAccess()
+    collectionCard = mongo_access.cardsCollection if addedCollectionCard is None else addedCollectionCard
+    collectionBoard = mongo_access.boardsCollection if addedCollectionBoard is None else addedCollectionBoard
     if addedCollectionCard is not None:
         collectionCard= addedCollectionCard
         collectionBoard = addedCollectionBoard
@@ -176,11 +176,12 @@ def delete_board_by_name(boardName, addedCollectionCard = None, addedCollectionB
 # Get all document from the boards collection
 def get_boards(addedCollection = None):
 
-    collection = boardsCollection
+    mongo_access = MongoAccess()
+    collection = mongo_access.boardsCollection if addedCollection is None else addedCollection
     if addedCollection is not None:
         collection = addedCollection
     try:
-        boards = list(collection.find({}))  
+        boards = list(collection.find({})) 
         return boards  
     except Exception as exception:
         print(f"An error occurred: {exception}")
@@ -189,22 +190,17 @@ def get_boards(addedCollection = None):
 # update a card on the board
 def update_card(boardID, listId, addedCollection = None):
 
-    collection = cardsCollection
-    if addedCollection is not None:
-        collection = addedCollection
-
+    mongo_access = MongoAccess()
+    collection = mongo_access.cardsCollection if addedCollection is None else addedCollection
+    
     try:
         # The update_one method is used to update a single document.
         result = collection.update_one(
             {"_id": boardID},
             {"$set": {"listId": listId}}
         )
-        # Check if the document was found and updated
-        if result.matched_count > 0:
-            if result.modified_count > 0:
-                return {"status": "success", "message": "Document updated."}
-            else:
-                return {"status": "success", "message": "Document already had the specified listId."}
+        if result.modified_count > 0:
+            return {"status": "success", "message": "Document updated."}
         else:
             return {"status": "error", "message": "No document found with the specified _id."}
     except Exception as exception:
@@ -213,10 +209,9 @@ def update_card(boardID, listId, addedCollection = None):
 
 # update a card on the board
 def delete_card(cardId, addedCollection = None):
+    mongo_access = MongoAccess()
+    collection = mongo_access.cardsCollection if addedCollection is None else addedCollection
 
-    collection = cardsCollection
-    if addedCollection is not None:
-        collection = addedCollection
     try:
         # The delete_one method attempts to delete the first document that matches the provided filter
         result = collection.delete_one({"_id": cardId})

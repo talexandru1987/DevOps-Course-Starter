@@ -10,7 +10,7 @@ from dotenv import load_dotenv, find_dotenv
 
 from todo_app.tests_e2e.mock_data_e2e import mock_boardsCollection_e2e, mock_cardsCollection_e2e
 
-from ..data.trello_items import *
+from ..data.mongo_items import *
 
 @pytest.fixture(scope="module")
 def app_with_temp_board():

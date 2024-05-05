@@ -1,6 +1,6 @@
 import pytest
 from dotenv import load_dotenv, find_dotenv
-from ..data.trello_items import *
+from ..data.mongo_items import *
 from ..data.view_model import ViewModel
 from .mock_data import *
 from .. import app
@@ -36,8 +36,8 @@ def setup_database():
 
 @pytest.fixture
 def create_items():
-    # Convert mock Trello card data into ViewModel items
-    items = [Item.from_trello_card(obj) for obj in cardsCollection.find()]
+    # Convert mock card data into ViewModel items
+    items = [Item.create_card(obj) for obj in cardsCollection.find()]
     return ViewModel(items)
 
 @pytest.fixture

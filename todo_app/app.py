@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect
 
 from todo_app.flask_config import Config
 
-from .data.trello_items import *
+from .data.mongo_items import *
 
 from .data.session_items import *
 
@@ -19,6 +19,7 @@ def create_app():
     def index():
         status = True
         boardsList = get_boards()
+        print(boardsList)
         return render_template("index.html", boardsList=boardsList, status=status)
 
     @app.route("/<id>")

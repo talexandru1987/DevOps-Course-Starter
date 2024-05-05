@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 import pytest
 
 def test_task_journey(driver, app_with_temp_board):
@@ -14,16 +15,14 @@ def test_navigate_to_board(driver, app_with_temp_board):
     driver.get("http://localhost:5000/")
     wait = WebDriverWait(driver, 10)
 
-    # Example ID taken from your provided IDs
-    board_id = "661bd26783cc1295b454f321"
     
     try:
         # Wait for the details summary to be clickable and click it to reveal the link
-        details_summary = wait.until(EC.element_to_be_clickable((By.ID, board_id)))
+        details_summary = wait.until(EC.element_to_be_clickable((By.TAG_NAME, "summary")))
         details_summary.click()
-
+        
         # Wait for the link inside the details to be clickable and click it
-        board_link = wait.until(EC.element_to_be_clickable((By.ID, f"a{board_id}")))
+        board_link = wait.until(EC.element_to_be_clickable((By.TAG_NAME, "a")))
         board_link.click()
         
         # Wait for the browser to navigate and the new page to load
@@ -38,3 +37,6 @@ def test_navigate_to_board(driver, app_with_temp_board):
 
     # # Assert that the newItem element is not None and thus present and visible
     assert newItemElement is not None, "newItem element not found on the page after navigation."
+
+
+

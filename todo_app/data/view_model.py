@@ -16,27 +16,21 @@ class ViewModel:
 
     @property
     def todo_items(self):
-        return list(filter(lambda item: item.status == "To Do", self._items))
+        return list(filter(lambda item: item.listName == "To Do", self._items))
 
     @property
     def doing_items(self):
-        return list(filter(lambda item: item.status == "Doing", self._items))
+        return list(filter(lambda item: item.listName == "Doing", self._items))
 
     @property
     def done_items(self):
-        return list(filter(lambda item: item.status == "Done", self._items))
+        return list(filter(lambda item: item.listName == "Done", self._items))
 
     @property
     def recent_done_items(self):
-        test = list(
-            filter(
-                lambda item: item.status == "Done" and self._is_today(item.date),
-                self._items,
-            )
-        )
         return list(
             filter(
-                lambda item: item.status == "Done" and self._is_today(item.date),
+                lambda item: item.listName == "Done" and self._is_today(item.date),
                 self._items,
             )
         )
@@ -45,7 +39,7 @@ class ViewModel:
     def older_done_items(self):
         return list(
             filter(
-                lambda item: item.status == "Done" and not (self._is_today(item.date)),
+                lambda item: item.listName == "Done" and not (self._is_today(item.date)),
                 self._items,
             )
         )

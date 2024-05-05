@@ -1,37 +1,52 @@
 import os
 from time import sleep
 from threading import Thread
+
+import mongomock
 from todo_app import app
 import pytest
 from selenium import webdriver
 from dotenv import load_dotenv, find_dotenv
 
-from ..data.trello_items import *
+from todo_app.tests_e2e.mock_data_e2e import mock_boardsCollection_e2e, mock_cardsCollection_e2e
 
+from ..data.mongo_items import *
 
 @pytest.fixture(scope="module")
 def app_with_temp_board():
+    # Load environment variables
     file_path = find_dotenv(".env")
     load_dotenv(file_path, override=True)
-    # Create the new board & update the board id environment variable
-    board_id = create_board("testBoard")
-    os.environ["TRELLO_BOARD_ID"] = board_id
 
-    # Construct the new application
+    # Setup Mock MongoDB client
+    mock_client = mongomock.MongoClient()
+    app.db = mock_client.db  # Assuming the app has a db attribute
+
+    # Clear existing data and insert mock data
+    boardsCollection = app.db.boards
+    cardsCollection = app.db.cards
+    boardsCollection.delete_many({})
+    cardsCollection.delete_many({})
+    boardsCollection.insert_many(mock_boardsCollection_e2e())
+    cardsCollection.insert_many(mock_cardsCollection_e2e())
+
+    # Optionally set environment variable for MongoDB collection
+    os.environ["MONGODB_COLLECTION"] = 'boards'
+
+    # Construct and start the Flask application in a separate thread
     application = app.create_app()
-
-    # Start the app in its own thread.
     thread = Thread(target=lambda: application.run(use_reloader=False))
     thread.daemon = True
     thread.start()
-    # Give the app a moment to start
-    sleep(1)
+    sleep(1)  # Allow time for the app to start
 
     yield application
 
-    # Tear Down
+    # Teardown the application and database
     thread.join(1)
-    delete_board(board_id)
+    boardsCollection.drop()
+    cardsCollection.drop()
+
 
 
 @pytest.fixture(scope="module")

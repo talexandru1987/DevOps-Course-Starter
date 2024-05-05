@@ -1,20 +1,44 @@
 import pytest
 from dotenv import load_dotenv, find_dotenv
-from ..data.trello_items import Item
+from ..data.mongo_items import *
 from ..data.view_model import ViewModel
 from .mock_data import *
 from .. import app
-import requests
-import os
+import mongomock
 
-testData = mock_cards()
+# Mock the MongoDB client
+mock_client = mongomock.MongoClient()
+cardsCollection = mock_client.db.cards
+boardsCollection = mock_client.db.boards
 
+
+# Convert timestamps for mock data
+def convert_timestamp(timestamp):
+    return datetime.fromtimestamp(timestamp / 1000)
+
+@pytest.fixture(autouse=True)
+def setup_database():
+    # Clear collections before each test
+    cardsCollection.delete_many({})
+    boardsCollection.delete_many({})
+    
+    # Insert mock data with converted timestamps
+    boards_data = mock_boardsCollection()
+    for board in boards_data:
+        board['created'] = convert_timestamp(board['created']['$date'])
+    boardsCollection.insert_many(boards_data)
+
+    cards_data = mock_cardsCollection()
+    for card in cards_data:
+        card['due'] = convert_timestamp(card['due']['$date'])
+        card['dateLastActivity'] = convert_timestamp(card['dateLastActivity']['$date'])
+    cardsCollection.insert_many(cards_data)
 
 @pytest.fixture
 def create_items():
-    items = [Item.from_trello_card(obj["card"], obj["list"]) for obj in testData]
+    # Convert mock card data into ViewModel items
+    items = [Item.create_card(obj) for obj in cardsCollection.find()]
     return ViewModel(items)
-
 
 @pytest.fixture
 def client():
@@ -30,37 +54,53 @@ def client():
         yield client
 
 
-class StubResponse:
-    def __init__(self, fake_response_data, status_code=200):
-        self.fake_response_data = fake_response_data
-        self.status_code = status_code
+def test_add_card():
+    card_name = "Test Add Card"
+    list_id = "testList123"
+    desc = "A test card"
+    due = datetime.now()
+    board = "testBoard123"
+    result = add_card(list_id, card_name, desc, due, board, cardsCollection)
+    assert result['_id'] is not None
+    assert cardsCollection.count_documents({}) == 3  # Assuming starting with 2 cards
 
-    def json(self):
-        return self.fake_response_data
-
-    def raise_for_status(self):
-        if 400 <= self.status_code < 600:
-            raise requests.HTTPError(f"HTTP error occured: {self.status_code}")
-
-
-# Stub replacement for requests.get(url)
-def stub(method, url, **kwargs):
-    assert method == "GET"
-    fake_response_data = None
-    boardId = "testCards"
-    listId = "64fwqdffe670fca0"
-    if url == f"https://api.trello.com/1/members/me/boards?fields=name":
-        fake_response_data = [
-            {"id": "fake7ffe670fc99", "name": "DevOps"},
-            {"id": "fakec631dc72cbe0a", "name": "Live Project"},
+def test_delete_board_by_name():
+    boardsCollection.insert_one({
+        "_id": "661bd26783cc1295b454f39711",
+        "name" : "Board to Delete",
+        "description" : "",
+        "created" :datetime.fromtimestamp(1713102967938 / 1000.0),
+        "boards" : "1"
+    })
+    cardsCollection.insert_one({
+        "_id" :"661bda5e1f5971bd6842416444",
+        "listId" : "657c834ff1b03a6ddfeadc94",
+        "name" : "First Item",
+        "due" :datetime.fromtimestamp(1713102967938 / 1000.0),
+        "dateLastActivity" : datetime.fromtimestamp(1713102967938 / 1000.0),
+        "desc" : "ewqe",
+        "boards" : [
+            "661bd26783cc1295b454f3971"
         ]
-        return StubResponse(fake_response_data, status_code=200)
-    elif url == f"https://api.trello.com/1/boards/{boardId}/lists":
-        fake_response_data = mock_board_lists()
-        return StubResponse(fake_response_data, status_code=200)
+    })
+    success = delete_board_by_name("Board to Delete", cardsCollection, boardsCollection)
+    assert success is True
+   
+def test_get_boards():
+    boardsCollection.insert_many([{"name": "Board1"}, {"name": "Board2"}])
+    boards = get_boards(boardsCollection)
+    assert len(boards) == 4
 
-    elif url == f"https://api.trello.com/1/lists/{listId}/cards":
-        fake_response_data = mock_list_cards()
-        return StubResponse(fake_response_data, status_code=200)
+def test_update_card():
+    cardsCollection.insert_one({"_id": "card123", "listId": "oldList"})
+    result = update_card("card123", "Done", cardsCollection)
+    assert result["status"] == "success"
+    updated_card = cardsCollection.find_one({"_id": "card123"})
+    assert updated_card["listId"] == "Done"
 
-    raise Exception(f'Integration test did not expect URL "{url}"')
+def test_delete_card():
+    cardsCollection.insert_one({"_id": "card123"})
+    result = delete_card("card123", cardsCollection)
+    assert result["status"] == "success"
+    assert cardsCollection.count_documents({}) == 2
+

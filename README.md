@@ -58,9 +58,8 @@ make a file change). There's also a
 variable which is used to encrypt the flask
 session cookie.
 
-The TRELLO_TOKEN, TRELLO_KEY in the `.env` need to
-be completed with the secure credentials from your
-trello account for the application to work.
+The CONNECTION_STRING in the `.env` needs to
+be completed with the secure link for azure cosmos DB.
 
 ## Running the App
 
@@ -91,8 +90,8 @@ in your web browser to view the app.
 ## Using the app
 
 Whe the app starts the user will be presented with
-dropdawn option containing the available boards on
-their Trello account. After choosing a board the
+dropdawn option containing the available boards from the mongo DB.
+After choosing a board the
 app will render all the cards on the board.
 
 ### Testing
@@ -279,6 +278,7 @@ az webapp config appsettings set -g <resource_group_name> -n <webapp_name> --set
 The app works on port 8000, so create a “New application setting” called WEBSITES_PORT with the value 8000
 
 ## Deployed app
+
 ```
 https://anothertodo.azurewebsites.net/
 
@@ -290,7 +290,6 @@ When there is a push to Main and the pipeline test passes, the new code is autom
 
 ## Connecting to CosmosDB
 
-
 In your terminal, ensure that the Poetry package manager is available by using this command in your terminal:
 
 ```
@@ -299,7 +298,7 @@ poetry shell
 
 Open the interpreter in your terminal by typing:
 
-``` 
+```
 python
 ```
 
@@ -310,5 +309,3 @@ import pymongo
 client = pymongo.MongoClient("connection string")
 client.list_database_names()
 ```
-
- 

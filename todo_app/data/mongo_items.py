@@ -6,8 +6,12 @@ from pymongo import MongoClient
 from .session_items import *
 
 
-#Get Connection sTrign for Mongo
+#github details
+GITHUB_CLIENT_ID = os.environ.get("OAUTH_ID")
+GITHUB_CLIENT_SECRET = os.environ.get("OAUTH_KEY")
+GITHUB_CALLBACK_URL = os.environ.get("OAUTH_URL")
 
+#Get Connection sTrign for Mongo
 def get_connection_string():
     return os.environ.get("CONNECTION_STRING")
 
@@ -223,4 +227,26 @@ def delete_card(cardId, addedCollection = None):
         print(f"An error occurred: {exception}")
         return {"status": "error", "message": "An error occurred during the deletion process."}
 
+
+def construct_github_url():
+    return f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_CALLBACK_URL}&scope=user:email"
+
+
+
+def exchange_code_for_token(code):
+
+    token_url = 'https://github.com/login/oauth/access_token'
+    payload = {
+        'client_id': GITHUB_CLIENT_ID,
+        'client_secret': GITHUB_CLIENT_SECRET,
+        'code': code,
+        'redirect_uri': 'https://anothertodo.azurewebsites.net/.auth/login/github/callback'
+    }
+    headers = {'Accept': 'application/json'}
+
+    response = requests.post(token_url, data=payload, headers=headers)
+    if response.ok:
+        return response.json().get('access_token')
+    else:
+        return None
 

@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect
-
+from flask import Flask, render_template, request, redirect, url_for
+from flask_login import LoginManager, login_required
+import os
 from todo_app.flask_config import Config
 
 from .data.mongo_items import *
@@ -11,11 +12,46 @@ from datetime import datetime
 from .data.view_model import *
 
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config())
 
+    login_manager = LoginManager()
+
+    @login_manager.unauthorized_handler
+    def unauthenticated():
+        github_auth_url = construct_github_url()
+        return redirect(github_auth_url)
+    
+    @login_manager.user_loader
+    def load_user(user_id):
+        pass
+
+    login_manager.init_app(app)
+
+
+    @app.route('/.auth/login/github/callback')
+    def github_callback():
+        # Extract the 'code' from the query parameters
+        code = request.args.get('code')
+        if not code:
+            return 'Authorization request failed', 400
+
+        # Exchange the code for an access token
+        access_token = exchange_code_for_token(code)
+        print(access_token)
+        if not access_token:
+            return 'Failed to fetch access token', 400
+
+        # Store the access token in a session or a secure place
+        session['access_token'] = access_token
+
+        # Redirect to a secure page or a dashboard
+        return redirect('/')
+
     @app.route("/")
+    @login_required
     def index():
         status = True
         boardsList = get_boards()
@@ -23,6 +59,7 @@ def create_app():
         return render_template("index.html", boardsList=boardsList, status=status)
 
     @app.route("/<id>")
+    @login_required
     def render_cards(id):
         status = False
 
@@ -44,6 +81,7 @@ def create_app():
         )
 
     @app.route("/add", methods=["POST"])
+    @login_required
     def add_new_item():
         boardId = session["boardID"]
         inputItem = request.form.get("inputItem")
@@ -60,6 +98,7 @@ def create_app():
         return redirect(f"/{boardId}")
 
     @app.route("/update", methods=["POST"])
+    @login_required
     def update_item():
         boardId = session["boardID"]
         cardId = request.form.get("card_id")
@@ -69,6 +108,7 @@ def create_app():
         return redirect(f"/{boardId}")
 
     @app.route("/delete", methods=["POST"])
+    @login_required
     def delete_an_item():
         boardId = session["boardID"]
         cardId = request.form.get("card_id")
@@ -76,6 +116,7 @@ def create_app():
         return redirect(f"/{boardId}")
     
     @app.route("/addBoard", methods=["POST"])
+    @login_required
     def create_new_board():
         boardName = request.form.get("inputItem")
         boardDescription = request.form.get("itemDescription")
@@ -83,6 +124,7 @@ def create_app():
         return redirect("/")
     
     @app.route("/deleteBoard", methods=["POST"])
+    @login_required
     def delete_board():
         boardName = request.form.get("deleteItem")
         delete_board_by_name(boardName)

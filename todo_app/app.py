@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_login import LoginManager, login_required
+from flask_login import LoginManager, UserMixin, login_required, login_user
 import os
 from todo_app.flask_config import Config
 
@@ -13,9 +13,17 @@ from .data.view_model import *
 
 
 
+# Define the User class
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config())
+
+    # Set LOGIN_DISABLED based on the environment variable
+    app.config['LOGIN_DISABLED'] = os.getenv('LOGIN_DISABLED') == 'True'
 
     login_manager = LoginManager()
 
@@ -26,7 +34,7 @@ def create_app():
     
     @login_manager.user_loader
     def load_user(user_id):
-        pass
+        return User(user_id)
 
     login_manager.init_app(app)
 
@@ -40,26 +48,38 @@ def create_app():
 
         # Exchange the code for an access token
         access_token = exchange_code_for_token(code)
-        print(access_token)
+
+        
         if not access_token:
             return 'Failed to fetch access token', 400
+        
+        #Get the authenticated user
+        authenticated_user = get_github_user(access_token)
+        
+
+        if not authenticated_user:
+            return 'Failed to fetch the authenticated user', 400
+        
+        # Construct a new instance of the User class
+        user = User(authenticated_user['id'])
+        login_user(user)
 
         # Store the access token in a session or a secure place
         session['access_token'] = access_token
+        session['user_info'] = authenticated_user
 
         # Redirect to a secure page or a dashboard
         return redirect('/')
 
     @app.route("/")
-    #@login_required
+    @login_required
     def index():
         status = True
         boardsList = get_boards()
-        print(boardsList)
         return render_template("index.html", boardsList=boardsList, status=status)
 
     @app.route("/<id>")
-    #@login_required
+    @login_required
     def render_cards(id):
         status = False
 
@@ -81,7 +101,7 @@ def create_app():
         )
 
     @app.route("/add", methods=["POST"])
-    #@login_required
+    @login_required
     def add_new_item():
         boardId = session["boardID"]
         inputItem = request.form.get("inputItem")
@@ -98,7 +118,7 @@ def create_app():
         return redirect(f"/{boardId}")
 
     @app.route("/update", methods=["POST"])
-    #@login_required
+    @login_required
     def update_item():
         boardId = session["boardID"]
         cardId = request.form.get("card_id")
@@ -108,7 +128,7 @@ def create_app():
         return redirect(f"/{boardId}")
 
     @app.route("/delete", methods=["POST"])
-    #@login_required
+    @login_required
     def delete_an_item():
         boardId = session["boardID"]
         cardId = request.form.get("card_id")
@@ -116,7 +136,7 @@ def create_app():
         return redirect(f"/{boardId}")
     
     @app.route("/addBoard", methods=["POST"])
-    #@login_required
+    @login_required
     def create_new_board():
         boardName = request.form.get("inputItem")
         boardDescription = request.form.get("itemDescription")
@@ -124,7 +144,7 @@ def create_app():
         return redirect("/")
     
     @app.route("/deleteBoard", methods=["POST"])
-    #@login_required
+    @login_required
     def delete_board():
         boardName = request.form.get("deleteItem")
         delete_board_by_name(boardName)

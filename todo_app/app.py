@@ -51,7 +51,7 @@ def create_app():
         return redirect('/')
 
     @app.route("/")
-    @login_required
+    #@login_required
     def index():
         status = True
         boardsList = get_boards()
@@ -59,7 +59,7 @@ def create_app():
         return render_template("index.html", boardsList=boardsList, status=status)
 
     @app.route("/<id>")
-    @login_required
+    #@login_required
     def render_cards(id):
         status = False
 
@@ -81,7 +81,7 @@ def create_app():
         )
 
     @app.route("/add", methods=["POST"])
-    @login_required
+    #@login_required
     def add_new_item():
         boardId = session["boardID"]
         inputItem = request.form.get("inputItem")
@@ -98,7 +98,7 @@ def create_app():
         return redirect(f"/{boardId}")
 
     @app.route("/update", methods=["POST"])
-    @login_required
+    #@login_required
     def update_item():
         boardId = session["boardID"]
         cardId = request.form.get("card_id")
@@ -108,7 +108,7 @@ def create_app():
         return redirect(f"/{boardId}")
 
     @app.route("/delete", methods=["POST"])
-    @login_required
+    #@login_required
     def delete_an_item():
         boardId = session["boardID"]
         cardId = request.form.get("card_id")
@@ -116,7 +116,7 @@ def create_app():
         return redirect(f"/{boardId}")
     
     @app.route("/addBoard", methods=["POST"])
-    @login_required
+    #@login_required
     def create_new_board():
         boardName = request.form.get("inputItem")
         boardDescription = request.form.get("itemDescription")
@@ -124,7 +124,7 @@ def create_app():
         return redirect("/")
     
     @app.route("/deleteBoard", methods=["POST"])
-    @login_required
+    #@login_required
     def delete_board():
         boardName = request.form.get("deleteItem")
         delete_board_by_name(boardName)

@@ -3,6 +3,8 @@ from flask_login import LoginManager, UserMixin, login_required, login_user
 import os
 from todo_app.flask_config import Config
 
+from .Authentication.Authentication import *
+
 from .data.mongo_items import *
 
 from .data.session_items import *

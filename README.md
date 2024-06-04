@@ -310,6 +310,8 @@ client = pymongo.MongoClient("connection string")
 client.list_database_names()
 ```
 
+## Setting up the app Authentication using GitHub
+
 ## Setting Up GitHub OAuth
 
 After setting up the application in GitHub, you need to add the details to this section of the .env file:

@@ -30,6 +30,9 @@ def app_with_temp_board():
     boardsCollection.insert_many(mock_boardsCollection_e2e())
     cardsCollection.insert_many(mock_cardsCollection_e2e())
 
+    # Disable authentication for testing
+    os.environ['LOGIN_DISABLED'] = 'True'
+
     # Optionally set environment variable for MongoDB collection
     os.environ["MONGODB_COLLECTION"] = 'boards'
 

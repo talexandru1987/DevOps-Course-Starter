@@ -309,3 +309,33 @@ import pymongo
 client = pymongo.MongoClient("connection string")
 client.list_database_names()
 ```
+
+## Setting up the app Authentication using GitHub
+
+## Setting Up GitHub OAuth
+
+After setting up the application in GitHub, you need to add the details to this section of the .env file:
+
+```
+Copy code
+OAUTH_ID=
+OAUTH_KEY=
+OAUTH_URL=
+ENV=
+```
+
+The ENV variable is a flag to indicate whether you are running locally or not. Leave it blank in this case.
+
+If you need to run the application locally with GitHub OAuth, add the details to this section of the .env file:
+
+```
+Copy code
+OAUTH_ID_L=
+OAUTH_KEY_L=
+OAUTH_URL_L=
+ENV=Local
+```
+
+Set the ENV variable to Local so the appropriate variables are used for OAuth.
+
+If you need to disable authentication for testing purposes, update the LOGIN_DISABLED variable in the .env file to True or False.

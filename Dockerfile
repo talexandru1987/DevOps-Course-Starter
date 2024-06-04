@@ -1,8 +1,8 @@
 
-FROM ubuntu:latest as base
+FROM python:3.9 as base
 
 #Install python
-RUN apt-get update && apt-get install -y python3.9 python3-pip
+#RUN apt-get update && apt-get install -y python3.9 python3-pip
 
 # Set environment variable
 ENV POETRY_HOME="/opt/poetry"

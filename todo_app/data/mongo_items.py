@@ -6,8 +6,8 @@ from pymongo import MongoClient
 from .session_items import *
 
 
-#Get Connection sTrign for Mongo
 
+#Get Connection sTrign for Mongo
 def get_connection_string():
     return os.environ.get("CONNECTION_STRING")
 

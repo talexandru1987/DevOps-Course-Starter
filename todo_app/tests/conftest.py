@@ -1,15 +1,38 @@
 import pytest
+import os
 from dotenv import load_dotenv, find_dotenv
 from ..data.mongo_items import *
 from ..data.view_model import ViewModel
 from .mock_data import *
 from .. import app
-import mongomock
+from datetime import datetime
+from flask import current_app
 
-# Mock the MongoDB client
-mock_client = mongomock.MongoClient()
-cardsCollection = mock_client.db.cards
-boardsCollection = mock_client.db.boards
+
+@pytest.fixture(scope="module")
+def app_with_context():
+    file_path = find_dotenv(".env.test")
+    load_dotenv(file_path, override=True)
+
+    # Set the environment variable to use the mock database for testing
+    os.environ['USE_MOCK_DB'] = 'True'
+
+    application = app.create_app()
+    with application.app_context():
+        yield application
+
+@pytest.fixture(scope="module")
+def mongo_access(app_with_context):
+    with app_with_context.app_context():
+        yield current_app.mongo_access
+
+@pytest.fixture(scope="module")
+def cardsCollection(mongo_access):
+    return mongo_access.cardsCollection
+
+@pytest.fixture(scope="module")
+def boardsCollection(mongo_access):
+    return mongo_access.boardsCollection
 
 
 # Convert timestamps for mock data
@@ -17,7 +40,7 @@ def convert_timestamp(timestamp):
     return datetime.fromtimestamp(timestamp / 1000)
 
 @pytest.fixture(autouse=True)
-def setup_database():
+def setup_database(cardsCollection, boardsCollection):
     # Clear collections before each test
     cardsCollection.delete_many({})
     boardsCollection.delete_many({})
@@ -35,26 +58,19 @@ def setup_database():
     cardsCollection.insert_many(cards_data)
 
 @pytest.fixture
-def create_items():
+def create_items(cardsCollection):
     # Convert mock card data into ViewModel items
     items = [Item.create_card(obj) for obj in cardsCollection.find()]
     return ViewModel(items)
 
 @pytest.fixture
-def client():
-    # Use our test integration config instead of the 'real' version
-    file_path = find_dotenv(".env.test")
-    load_dotenv(file_path, override=True)
-
-    # Create the new app.
-    test_app = app.create_app()
-
-    # Use the app to create a test_client that can be used in our tests.
-    with test_app.test_client() as client:
+def client(app_with_context):
+    with app_with_context.test_client() as client:
         yield client
 
 
-def test_add_card():
+
+def test_add_card(cardsCollection):
     card_name = "Test Add Card"
     list_id = "testList123"
     desc = "A test card"
@@ -64,7 +80,7 @@ def test_add_card():
     assert result['_id'] is not None
     assert cardsCollection.count_documents({}) == 3  # Assuming starting with 2 cards
 
-def test_delete_board_by_name():
+def test_delete_board_by_name(cardsCollection, boardsCollection):
     boardsCollection.insert_one({
         "_id": "661bd26783cc1295b454f39711",
         "name" : "Board to Delete",
@@ -86,19 +102,19 @@ def test_delete_board_by_name():
     success = delete_board_by_name("Board to Delete", cardsCollection, boardsCollection)
     assert success is True
    
-def test_get_boards():
+def test_get_boards(boardsCollection):
     boardsCollection.insert_many([{"name": "Board1"}, {"name": "Board2"}])
     boards = get_boards(boardsCollection)
     assert len(boards) == 4
 
-def test_update_card():
+def test_update_card(cardsCollection):
     cardsCollection.insert_one({"_id": "card123", "listId": "oldList"})
     result = update_card("card123", "Done", cardsCollection)
     assert result["status"] == "success"
     updated_card = cardsCollection.find_one({"_id": "card123"})
     assert updated_card["listId"] == "Done"
 
-def test_delete_card():
+def test_delete_card(cardsCollection):
     cardsCollection.insert_one({"_id": "card123"})
     result = delete_card("card123", cardsCollection)
     assert result["status"] == "success"

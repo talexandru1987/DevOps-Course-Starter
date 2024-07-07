@@ -1,27 +1,8 @@
 import requests
-import os
 from datetime import datetime
-from pymongo import MongoClient
-
 from .session_items import *
+from flask import current_app
 
-
-
-#Get Connection sTrign for Mongo
-def get_connection_string():
-    return os.environ.get("CONNECTION_STRING")
-
-def get_collection(databaseNem, collectionName):
-    return databaseNem[collectionName]
-
-#database connection
-class MongoAccess():
-    def __init__(self):
-        conn_str = os.environ.get("CONNECTION_STRING")
-        client= MongoClient(conn_str)
-        db = client['ToDo-Database']
-        self.cardsCollection = db['todo-cards']
-        self.boardsCollection = db['todo-boards']
 
 #One item contains all the data for 1 card
 class Item:
@@ -70,11 +51,9 @@ class Item:
             listName,
         )
 
-
 # Add a new document to the DBcard
-
 def add_card(listId, cardName, desc, due, board, addedCollection = None):
-    mongo_access = MongoAccess()
+    mongo_access = current_app.mongo_access
     collection = mongo_access.cardsCollection if addedCollection is None else addedCollection
 
     card_document = {
@@ -98,7 +77,7 @@ def add_card(listId, cardName, desc, due, board, addedCollection = None):
 
 # get cards on a board
 def get_cards(id, addedCollection = None):
-    mongo_access = MongoAccess()
+    mongo_access = current_app.mongo_access
     collection = mongo_access.cardsCollection if addedCollection is None else addedCollection
 
     #get all the documents
@@ -119,7 +98,7 @@ def get_cards(id, addedCollection = None):
 # create a new board
 def create_board(boardName, description, addedCollection = None):
 
-    mongo_access = MongoAccess()
+    mongo_access = current_app.mongo_access
     collection = mongo_access.boardsCollection if addedCollection is None else addedCollection
     board_document = {
         "name": boardName,
@@ -141,7 +120,7 @@ def create_board(boardName, description, addedCollection = None):
 #Delete a document from the boards collection
 def delete_board_by_name(boardName, addedCollectionCard = None, addedCollectionBoard = None):
 
-    mongo_access = MongoAccess()
+    mongo_access = current_app.mongo_access
     collectionCard = mongo_access.cardsCollection if addedCollectionCard is None else addedCollectionCard
     collectionBoard = mongo_access.boardsCollection if addedCollectionBoard is None else addedCollectionBoard
     if addedCollectionCard is not None:
@@ -176,7 +155,7 @@ def delete_board_by_name(boardName, addedCollectionCard = None, addedCollectionB
 # Get all document from the boards collection
 def get_boards(addedCollection = None):
 
-    mongo_access = MongoAccess()
+    mongo_access = current_app.mongo_access
     collection = mongo_access.boardsCollection if addedCollection is None else addedCollection
     if addedCollection is not None:
         collection = addedCollection
@@ -190,7 +169,7 @@ def get_boards(addedCollection = None):
 # update a card on the board
 def update_card(boardID, listId, addedCollection = None):
 
-    mongo_access = MongoAccess()
+    mongo_access = current_app.mongo_access
     collection = mongo_access.cardsCollection if addedCollection is None else addedCollection
     
     try:
@@ -209,7 +188,7 @@ def update_card(boardID, listId, addedCollection = None):
 
 # update a card on the board
 def delete_card(cardId, addedCollection = None):
-    mongo_access = MongoAccess()
+    mongo_access = current_app.mongo_access
     collection = mongo_access.cardsCollection if addedCollection is None else addedCollection
 
     try:

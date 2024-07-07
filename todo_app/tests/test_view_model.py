@@ -1,6 +1,3 @@
-# import sys
-# print(sys.executable)
-
 # UNIT Tests
 from .conftest import *
 from datetime import datetime

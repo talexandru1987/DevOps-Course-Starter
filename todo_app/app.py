@@ -1,16 +1,12 @@
+import os
+from .data.mongo_access import MongoAccess
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_required, login_user
-import os
 from todo_app.flask_config import Config
-
 from .Authentication.Authentication import *
-
 from .data.mongo_items import *
-
 from .data.session_items import *
-
 from datetime import datetime
-
 from .data.view_model import *
 
 
@@ -26,6 +22,9 @@ def create_app():
 
     # Set LOGIN_DISABLED based on the environment variable
     app.config['LOGIN_DISABLED'] = os.getenv('LOGIN_DISABLED') == 'True'
+
+    # Initialize MongoAccess
+    app.mongo_access = MongoAccess()
 
     login_manager = LoginManager()
 

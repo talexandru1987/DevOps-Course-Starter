@@ -37,8 +37,8 @@ resource "azurerm_linux_web_app" "main" {
 
   site_config {
     application_stack {
-      docker_image     = "appsvcsample/python-helloworld"
-      docker_image_tag = "latest"
+      docker_image     = "talexandru87/todo-app:latest"
+      docker_registry_url   = "https://index.docker.io"
     }
   }
 
@@ -110,18 +110,4 @@ resource "azurerm_cosmosdb_mongo_collection" "todo_cards" {
   }
 }
 
-output "cosmosdb_account_endpoint" {
-  value = azurerm_cosmosdb_account.terraCosmos.endpoint
-}
 
-output "cosmosdb_database_id" {
-  value = azurerm_cosmosdb_mongo_database.terraDatabase.id
-}
-
-output "cosmosdb_todo_boards_collection_id" {
-  value = azurerm_cosmosdb_mongo_collection.todo_boards.id
-}
-
-output "cosmosdb_todo_cards_collection_id" {
-  value = azurerm_cosmosdb_mongo_collection.todo_cards.id
-}

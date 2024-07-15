@@ -1,3 +1,7 @@
+locals {
+  oauth_url = "https://${var.prefix}-terraformToDo.azurewebsites.net/.auth/login/github/callback"
+}
+
 terraform {
   required_providers {
     azurerm = {
@@ -34,23 +38,22 @@ resource "azurerm_linux_web_app" "main" {
   location            = data.azurerm_resource_group.main.location
   resource_group_name = data.azurerm_resource_group.main.name
   service_plan_id     = azurerm_service_plan.main.id
-
+  
   site_config {
     application_stack {
-      docker_image     = "talexandru87/todo-app:latest"
-      docker_registry_url   = "https://index.docker.io"
+      docker_image_name     = "talexandru87/todo-app:prod"
+      docker_registry_url = "https://index.docker.io"
     }
   }
 
   app_settings = {
     "DOCKER_REGISTRY_SERVER_URL" = "https://index.docker.io"
-    "MONGODB_CONNECTION_STRING"  = var.mongodb_connection_string
     "FLASK_APP"                  = var.flask_app
     "FLASK_ENV"                  = var.flask_env
     "SECRET_KEY"                 = var.secret_key
     "OAUTH_ID"                   = var.oauth_client_id
     "OAUTH_KEY"                  = var.oauth_client_secret
-    "OAUTH_URL"                  = var.oauth_url
+    "OAUTH_URL"                  = local.oauth_url
     "ENV"                        = var.env
     "LOGIN_DISABLED"             = var.login_disabled
   }

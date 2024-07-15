@@ -26,8 +26,9 @@ variable "oauth_client_secret" {
   sensitive   = true
 }
 
-variable "mongodb_connection_string" {
-  description = "MongoDB connection string"
+
+variable "secret_key" {
+  description = "Secret key for Flask app"
   type        = string
   sensitive   = true
 }
@@ -44,17 +45,6 @@ variable "flask_env" {
   default     = "development"
 }
 
-variable "secret_key" {
-  description = "Secret key for Flask app"
-  type        = string
-  sensitive   = true
-}
-
-variable "oauth_url" {
-  description = "OAuth URL"
-  type        = string
-  default     = "https://anothertodo.azurewebsites.net/.auth/login/github/callback"
-}
 
 variable "env" {
   description = "Environment name"

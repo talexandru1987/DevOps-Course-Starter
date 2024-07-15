@@ -72,37 +72,41 @@ def test_older_done_items(create_items):
     ), "Not all items have a status of Done and older than today's date"
 
 
-# # Integration Tests
-# def test_index_page(monkeypatch, client):
+# Integration Tests
+def test_index_page(monkeypatch, client):
 
-#    # Mocked response that looks like MongoDB output
-#     mocked_response = [{
-#         '_id': '661bd26783cc1295b454f321',
-#         'name': 'Test Integration',
-#         'description': '',
-#         'created': datetime(2024, 4, 14, 13, 56, 7, 938000),
-#         'boards': '1'
-#     }]
+   # Mocked response that looks like MongoDB output
+    mocked_response = [
+    {
+        "_id": "661bd26783cc1295b454f321",
+        "name" : "Test Integration",
+        "description" : "",
+        "created" : {
+            "$date" : 1713102967938
+        },
+        "boards" : "1"
+    }]
     
 
-#     # Function to replace the actual database call
-#     def mock_get_boards():
-        
-#         return mocked_response
+    # Function to replace the actual database call
+    def mock_get_boards():
+        return mocked_response
     
-#     # Replace the get_boards function with mock data
-#     monkeypatch.setattr('todo_app.data.mongo_items.get_boards', mock_get_boards)
+    # Replace the get_boards function with mock data
+    monkeypatch.setattr('todo_app.data.mongo_items.get_boards', mock_get_boards)
+    
 
-#     # Make a request to app's index page
-#     response = client.get("/")
+    # Make a request to app's index page
+    response = client.get("/")
 
-#     # Assert the status code
-#     assert response.status_code == 200
+    # Assert the status code
+    assert response.status_code == 200
 
-#     # Decode the response data and assert the contents
-#     data = response.data.decode()
-#     assert "Test Integration" in data
-#     assert "661bd26783cc1295b454f321" in data
+    # Decode the response data and assert the contents
+    data = response.data.decode()
+    print(data)
+    assert "Test Integration" in data
+    assert "661bd26783cc1295b454f321" in data
 
 
 # def test_cards_page(monkeypatch, client):

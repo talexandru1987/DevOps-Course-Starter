@@ -17,6 +17,9 @@ def app_with_context():
     # Set the environment variable to use the mock database for testing
     os.environ['USE_MOCK_DB'] = 'True'
 
+    # Disable authentication for testing
+    os.environ['LOGIN_DISABLED'] = 'True'
+
     application = app.create_app()
     with application.app_context():
         yield application

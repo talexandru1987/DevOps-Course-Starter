@@ -26,6 +26,11 @@ variable "oauth_client_secret" {
   sensitive   = true
 }
 
+variable "mongodb_connection_string" {
+  description = "MongoDB connection string"
+  type        = string
+  sensitive   = true
+}
 
 variable "secret_key" {
   description = "Secret key for Flask app"

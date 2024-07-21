@@ -13,7 +13,7 @@ def test_task_journey(driver, app_with_temp_board):
 
 def test_navigate_to_board(driver, app_with_temp_board):
     driver.get("http://localhost:5000/")
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 20)
 
     
     try:

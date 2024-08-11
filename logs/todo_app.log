@@ -70,3 +70,4 @@ Traceback (most recent call last):
     raise ValueError("time data %r does not match format %r" %
 ValueError: time data '26-04-' does not match format '%d-%m-%y'
 2024-08-08 15:32:15,576 INFO: Rendering cards for board id: favicon.ico [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:118]
+2024-08-11 14:14:03,062 INFO: Todo App startup [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:68]

@@ -16,6 +16,7 @@ pymongo = "^4.6.2"
 mongomock = "^4.1.2"
 flask-login = "^0.6.3"
 prometheus-flask-exporter = "^0.23.1"
+loggly-python-handler = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 

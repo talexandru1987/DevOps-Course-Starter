@@ -1,0 +1,72 @@
+2024-08-08 08:23:39,922 INFO: Todo App startup [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:56]
+2024-08-08 08:24:14,268 INFO: Board added [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:161]
+2024-08-08 08:24:14,274 INFO: Loggin Successful [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:93]
+2024-08-08 08:42:07,741 INFO: Todo App startup [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:56]
+2024-08-08 08:51:41,196 INFO: Todo App startup [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:56]
+2024-08-08 08:51:53,685 INFO: Board 'dwd' created with description 'dwadaw' [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:164]
+2024-08-08 08:52:07,593 INFO: Board '2' deleted [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:172]
+2024-08-08 08:52:18,381 INFO: Rendering cards for board id: 661bd26783cc1295b454f321 [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:110]
+2024-08-08 08:52:28,128 ERROR: Exception on /add [POST] [in D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py:1414]
+Traceback (most recent call last):
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py", line 130, in add_new_item
+    date_object = datetime.strptime(dueDate, "%d-%m-%y").date()
+  File "C:\Users\alexa\AppData\Local\Programs\Python\Python310\lib\_strptime.py", line 568, in _strptime_datetime
+    tt, fraction, gmtoff_fraction = _strptime(data_string, format)
+  File "C:\Users\alexa\AppData\Local\Programs\Python\Python310\lib\_strptime.py", line 349, in _strptime
+    raise ValueError("time data %r does not match format %r" %
+ValueError: time data '08-08-' does not match format '%d-%m-%y'
+2024-08-08 08:52:28,299 INFO: Rendering cards for board id: favicon.ico [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:110]
+2024-08-08 15:15:18,581 ERROR: Exception on /add [POST] [in D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py:1414]
+Traceback (most recent call last):
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py", line 130, in add_new_item
+    date_object = datetime.strptime(dueDate, "%d-%m-%y").date()
+  File "C:\Users\alexa\AppData\Local\Programs\Python\Python310\lib\_strptime.py", line 568, in _strptime_datetime
+    tt, fraction, gmtoff_fraction = _strptime(data_string, format)
+  File "C:\Users\alexa\AppData\Local\Programs\Python\Python310\lib\_strptime.py", line 349, in _strptime
+    raise ValueError("time data %r does not match format %r" %
+ValueError: time data '08-08-' does not match format '%d-%m-%y'
+2024-08-08 15:31:13,930 INFO: Todo App startup [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:64]
+2024-08-08 15:31:53,179 INFO: Board 'gewsg' created with description 'gege' [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:172]
+2024-08-08 15:32:02,169 INFO: Board 'jtrj' deleted [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:180]
+2024-08-08 15:32:05,055 INFO: Board 'fewfwegwegewg' deleted [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:180]
+2024-08-08 15:32:10,010 INFO: Rendering cards for board id: 66b46ac5b10defa11067e419 [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:118]
+2024-08-08 15:32:15,465 ERROR: Exception on /add [POST] [in D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py:1414]
+Traceback (most recent call last):
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\.venv\lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py", line 138, in add_new_item
+    date_object = datetime.strptime(dueDate, "%d-%m-%y").date()
+  File "C:\Users\alexa\AppData\Local\Programs\Python\Python310\lib\_strptime.py", line 568, in _strptime_datetime
+    tt, fraction, gmtoff_fraction = _strptime(data_string, format)
+  File "C:\Users\alexa\AppData\Local\Programs\Python\Python310\lib\_strptime.py", line 349, in _strptime
+    raise ValueError("time data %r does not match format %r" %
+ValueError: time data '26-04-' does not match format '%d-%m-%y'
+2024-08-08 15:32:15,576 INFO: Rendering cards for board id: favicon.ico [in D:\DEVELOPMENT\DevOps-Course-Starter\todo_app\app.py:118]

@@ -8,6 +8,11 @@ from .data.mongo_items import *
 from .data.session_items import *
 from datetime import datetime
 from .data.view_model import *
+import logging
+from logging.handlers import RotatingFileHandler
+from loggly.handlers import HTTPSHandler
+from logging import Formatter
+from prometheus_flask_exporter import PrometheusMetrics
 
 
 
@@ -19,6 +24,9 @@ class User(UserMixin):
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config())
+
+    # Add Prometheus metrics
+    metrics = PrometheusMetrics(app) 
 
     # Set LOGIN_DISABLED based on the environment variable
     app.config['LOGIN_DISABLED'] = os.getenv('LOGIN_DISABLED') == 'True'
@@ -39,12 +47,32 @@ def create_app():
 
     login_manager.init_app(app)
 
+    # Configure logging
+    if not app.debug:
+        if not os.path.exists('logs'):
+            os.mkdir('logs')
+        file_handler = RotatingFileHandler('logs/todo_app.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+    
+    app.logger.setLevel(app.config['LOG_LEVEL'])
+    if app.config['LOGGLY_TOKEN'] is not None:
+        handler = HTTPSHandler(f'https://logs-01.loggly.com/inputs/{app.config["LOGGLY_TOKEN"]}/tag/todo-app')
+        handler.setFormatter(
+            Formatter("[%(asctime)s] %(levelname)s in %(module)s: %(message)s")
+        )
+        app.logger.addHandler(handler)
+    app.logger.info('Todo App startup')
 
     @app.route('/.auth/login/github/callback')
     def github_callback():
         # Extract the 'code' from the query parameters
         code = request.args.get('code')
         if not code:
+            app.logger.error('Authorization request failed')
             return 'Authorization request failed', 400
 
         # Exchange the code for an access token
@@ -52,6 +80,7 @@ def create_app():
 
         
         if not access_token:
+            app.logger.error('Failed to fetch access token')
             return 'Failed to fetch access token', 400
         
         #Get the authenticated user
@@ -59,6 +88,7 @@ def create_app():
         
 
         if not authenticated_user:
+            app.logger.error('Failed to fetch the authenticated user')
             return 'Failed to fetch the authenticated user', 400
         
         # Construct a new instance of the User class
@@ -89,7 +119,7 @@ def create_app():
 
         #add to session items
         save_board_id(id)
-
+        app.logger.info(f"Rendering cards for board id: {id}")
         return render_template(
             "index.html",
             doneCardsList=allCardsModel.done_items,
@@ -115,7 +145,7 @@ def create_app():
 
         if inputItem:
             add_card(selectedList, inputItem, itemDescription, due_datetime, boardId)
-
+        app.logger.info(f"Item '{inputItem}' added to board {boardId} in list {selectedList}")
         return redirect(f"/{boardId}")
 
     @app.route("/update", methods=["POST"])
@@ -125,7 +155,7 @@ def create_app():
         cardId = request.form.get("card_id")
         listId = request.form.get("updateList")
         update_card(cardId, listId)
-
+        app.logger.info(f"Item '{cardId}' updated to list '{listId}' in board '{boardId}'")
         return redirect(f"/{boardId}")
 
     @app.route("/delete", methods=["POST"])
@@ -134,6 +164,7 @@ def create_app():
         boardId = session["boardID"]
         cardId = request.form.get("card_id")
         delete_card(cardId)
+        app.logger.info(f"Item '{cardId}' deleted from board '{boardId}'")
         return redirect(f"/{boardId}")
     
     @app.route("/addBoard", methods=["POST"])
@@ -142,6 +173,7 @@ def create_app():
         boardName = request.form.get("inputItem")
         boardDescription = request.form.get("itemDescription")
         create_board(boardName,boardDescription )
+        app.logger.info(f"Board '{boardName}' created with description '{boardDescription}'")
         return redirect("/")
     
     @app.route("/deleteBoard", methods=["POST"])
@@ -149,6 +181,7 @@ def create_app():
     def delete_board():
         boardName = request.form.get("deleteItem")
         delete_board_by_name(boardName)
+        app.logger.info(f"Board '{boardName}' deleted")
         return redirect("/")
 
     return app

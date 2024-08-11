@@ -525,6 +525,35 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "prometheus-client"
+version = "0.20.0"
+description = "Python client for the Prometheus monitoring system."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "prometheus_client-0.20.0-py3-none-any.whl", hash = "sha256:cde524a85bce83ca359cc837f28b8c0db5cac7aa653a588fd7e84ba061c329e7"},
+    {file = "prometheus_client-0.20.0.tar.gz", hash = "sha256:287629d00b147a32dcb2be0b9df905da599b2d82f80377083ec8463309a4bb89"},
+]
+
+[package.extras]
+twisted = ["twisted"]
+
+[[package]]
+name = "prometheus-flask-exporter"
+version = "0.23.1"
+description = "Prometheus metrics exporter for Flask"
+optional = false
+python-versions = "*"
+files = [
+    {file = "prometheus_flask_exporter-0.23.1-py3-none-any.whl", hash = "sha256:ab49b2c40b57cd35cd51e91e59b3c306b3754477095c4f3cf679034c5122398c"},
+    {file = "prometheus_flask_exporter-0.23.1.tar.gz", hash = "sha256:587c770a1061e93d72c5cbcdefbd7b633fb764e39dffd7dd16932c9124559244"},
+]
+
+[package.dependencies]
+flask = "*"
+prometheus-client = "*"
+
+[[package]]
 name = "pycparser"
 version = "2.21"
 description = "C parser in Python"
@@ -871,4 +900,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "140941d6c4dc2eb71e65594609d7425a4d03109f48a302f6cbfaceabebb58075"
+content-hash = "bc5c984cc3c6cdf9f3b1ab61b4afe2fe69b1a55d0c28e138d11455f1ef252cd0"

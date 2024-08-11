@@ -339,3 +339,8 @@ ENV=Local
 Set the ENV variable to Local so the appropriate variables are used for OAuth.
 
 If you need to disable authentication for testing purposes, update the LOGIN_DISABLED variable in the .env file to True or False.
+
+##Setting Up log files
+
+The app will save all the logs in the logs folder and also send them to Loggly.
+For Loggly to work, you need to add the token to the .env file under the LOGGLY_TOKEN variable.

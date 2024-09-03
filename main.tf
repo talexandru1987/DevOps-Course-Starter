@@ -48,7 +48,7 @@ resource "azurerm_linux_web_app" "main" {
 
   app_settings = {
     "DOCKER_REGISTRY_SERVER_URL" = "https://index.docker.io"
-    "MONGODB_CONNECTION_STRING"  = var.mongodb_connection_string
+    "MONGODB_CONNECTION_STRING"  = azurerm_cosmosdb_account.terraCosmos.primary_mongodb_connection_string
     "FLASK_APP"                  = var.flask_app
     "FLASK_ENV"                  = var.flask_env
     "SECRET_KEY"                 = var.secret_key
